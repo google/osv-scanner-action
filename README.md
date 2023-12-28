@@ -1,0 +1,1 @@
+Repository for osv-scanner-action. Currently WIP.

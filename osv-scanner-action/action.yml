@@ -14,17 +14,17 @@
 
 # Not intended to be used directly, see action.yml at the root of this repository
 # for a workflow which uses osv-scanner.
-name: 'osv-scanner'
-description: 'Scans your directory against the OSV database. We recommend using the reusable workflows instead of directly using the scanner action as the scanner action behavior might change in a minor patch update.'
+name: "osv-scanner"
+description: "Scans your directory against the OSV database. We recommend using the reusable workflows instead of directly using the scanner action as the scanner action behavior might change in a minor patch update."
 inputs:
   scan-args:
-    description: 'Arguments to osv-scanner, separated by new line'
+    description: "Arguments to osv-scanner, separated by new line"
     default: |-
       --skip-git
       --recursive
       ./
 runs:
-  using: 'docker'
-  image: 'ghcr.io/google/osv-scanner-action:v1.5.0'
+  using: "docker"
+  image: "docker://ghcr.io/google/osv-scanner-action:v1.6.1"
   args:
     - ${{ inputs.scan-args }}

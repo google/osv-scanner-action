@@ -1,23 +1,30 @@
-# OSV-Scanner Github Action
+# OSV-Scanner CI/CD Action
 
 [![GitHub Action Release](https://img.shields.io/github/v/release/google/osv-scanner)](https://github.com/google/osv-scanner-action/)
 <!-- Uses the osv-scanner release version -->
 
-[OSV-Scanner](https://google.github.io/osv-scanner/) is offered as a GitHub Action that can be configured to do the following:
+The OSV-Scanner CI/CD action leverages the [OSV.dev](https://osv.dev/) database and the [OSV-Scanner](https://google.github.io/osv-scanner/) CLI tool to track and notify you of known vulnerabilities in your dependencies. We currently offer two different reusable workflows for Github:
 
-1. Trigger a scan with each [pull request](#scan-on-pull-request) and will only report new open source vulnerabilities introduced through the pull request.
-2. Perform a full vulnerability scan, configured to run on a [regular schedule](#scheduled-scan).
+1. A workflow that triggers a scan with each [pull request](./github-action.md#scan-on-pull-request) and will only report new vulnerabilities introduced through the pull request.
+2. A workflow that performs a full vulnerability scan, which can be configured to scan on pushes or a [regular schedule](./github-action.md#scheduled-scans). The full vulnerability scan can also be configured to run [on release](./github-action.md#scan-on-release) to prevent releasing with known vulnerabilities in dependencies.
 
+Currently there is no prebuilt workflows for other platforms, but we welcome any contributions for this!
+
+### Scheduled scan
+Regularly scanning your project for vulnerabilities can alert you to new vulnerabilities in your dependency tree. The scheduled scan will scan your project on a set schedule or when a new commit is pushed, and report all known vulnerabilities. If vulnerabilities are found it will be reported to the "Code scanning" page.
+
+|                          OSV-Scanner Code Scanning Results                           |                                 Code Scanning Detailed Entry                                  |
+| :------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------: |
+| ![Image of results in code scanning tab](images/github-action-code-scanning.png) | ![Image of details of specific in code scanning entry](images/github-action-code-details.png) |
 
 ### Scan on pull request
 Scanning your project on each pull request can help you keep vulnerabilities out of your project. The pull request scan compares a vulnerability scan of the target branch to a vulnerability scan of the feature branch, and will fail if there are new vulnerabilities introduced through the feature branch. You may choose to [prevent merging](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches#require-status-checks-before-merging) if new vulnerabilities are introduced, but by default the check will only warn users.
 
-### Scheduled scan
-Regularly scanning your project for vulnerabilities can alert you to new vulnerabilities in your dependency tree. The scheduled scan will scan your project on a set schedule and report all known vulnerabilities. If vulnerabilities are found the action will return a failed status.
+|                                                 OSV-Scanner PR Check Failing                                                  |                         PR Scanning Check Output                          |
+| :---------------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------: |
+| ![Screenshot of PR introducing a vulnerable dependency, and osv-scanner blocking check](images/github-action-PR-scanning.png) | ![Screenshot of osv-scanner output](images/github-action-scan-output.png) |
 
 ## Installation
-
-The OSV-Scanner GitHub Action can be [manually](#manual-installation) installed. 
 
 <!-- The OSV-Scanner GitHub Action can be [automatically](#automatic-installation) or [manually](#manual-installation) installed.  -->
 
@@ -55,7 +62,7 @@ If you want both, you can leave the action as is. If you want these functionalit
 
 ### Manual installation
 
-To manually install the GitHub Action, please follow instructions on our [main documentation page](https://google.github.io/osv-scanner/github-action/).
+To manually install the CI/CD Action for Github, please follow instructions on our [main documentation page](https://google.github.io/osv-scanner/github-action/).
 
 ## Customization
 

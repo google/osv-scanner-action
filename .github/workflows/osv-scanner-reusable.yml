@@ -80,7 +80,8 @@ jobs:
       # Upload the results as artifacts (optional). Commenting out will disable uploads of run results in SARIF
       # format to the repository Actions tab.
       - name: "Upload artifact"
-        if: "!cancelled()"
+        id: "upload_artifact"
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4 # v4.0.0
         with:
           name: SARIF file
@@ -92,3 +93,7 @@ jobs:
         uses: github/codeql-action/upload-sarif@407ffafae6a767df3e0230c3df91b6443ae8df75 # v2.22.8
         with:
           sarif_file: ${{ inputs.results-file-name }}
+      - name: "Error troubleshooter"
+        if: ${{ always() && steps.upload_artifact.outcome == 'failure' }}
+        run: |
+          echo "::error::Artifact upload failed. This is most likely caused by a error during scanning earlier in the workflow."

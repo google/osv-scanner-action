@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Not intended to be used directly, see action.yml at the root of this repository
+# Not intended to be used directly, see .github/workflows/osv-scanner-unified-workflow.yml file
 # for a workflow which uses osv-scanner.
 name: "osv-scanner-reporter"
 description: "Specialized reporting of scanner results for github actions. (Experimental)"
@@ -22,7 +22,7 @@ inputs:
     required: true
 runs:
   using: "docker"
-  image: "docker://ghcr.io/google/osv-scanner-action:v1.6.2"
+  image: "docker://ghcr.io/google/osv-scanner-action:v1.7.0"
   entrypoint: /root/osv-reporter
   args:
     - "${{ inputs.scan-args }}"

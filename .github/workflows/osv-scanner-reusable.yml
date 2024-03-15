@@ -97,3 +97,4 @@ jobs:
         if: ${{ always() && steps.upload_artifact.outcome == 'failure' }}
         run: |
           echo "::error::Artifact upload failed. This is most likely caused by a error during scanning earlier in the workflow."
+          exit 1

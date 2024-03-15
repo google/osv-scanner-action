@@ -54,7 +54,7 @@ jobs:
       - name: "Checkout target branch"
         run: git checkout $GITHUB_BASE_REF
       - name: "Run scanner on existing code"
-        uses: google/osv-scanner-action/osv-scanner-action@v1.6.2-beta1
+        uses: google/osv-scanner-action/osv-scanner-action@v1.7.0-beta1
         continue-on-error: true
         with:
           scan-args: |-
@@ -64,7 +64,7 @@ jobs:
       - name: "Checkout current branch"
         run: git checkout $GITHUB_SHA
       - name: "Run scanner on new code"
-        uses: google/osv-scanner-action/osv-scanner-action@v1.6.2-beta1
+        uses: google/osv-scanner-action/osv-scanner-action@v1.7.0-beta1
         with:
           scan-args: |-
             --format=json
@@ -72,7 +72,7 @@ jobs:
             ${{ inputs.scan-args }}
         continue-on-error: true
       - name: "Run osv-scanner-reporter"
-        uses: google/osv-scanner-action/osv-reporter-action@v1.6.2-beta1
+        uses: google/osv-scanner-action/osv-reporter-action@v1.7.0-beta1
         with:
           scan-args: |-
             --output=${{ inputs.results-file-name }}
@@ -83,21 +83,21 @@ jobs:
       # Upload the results as artifacts (optional). Commenting out will disable uploads of run results in SARIF
       # format to the repository Actions tab.
       - name: "Upload artifact"
-        if: "!cancelled()"
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
         with:
           name: SARIF file
           path: ${{ inputs.results-file-name }}
           retention-days: 5
       - name: "Upload old scan json results"
-        if: "!cancelled()"
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: old-json-results
           path: old-results.json
           retention-days: 5
       - name: "Upload new scan json results"
-        if: "!cancelled()"
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: new-json-results
@@ -105,7 +105,13 @@ jobs:
           retention-days: 5
       # Upload the results to GitHub's code scanning dashboard.
       - name: "Upload to code-scanning"
+        id: "upload_artifact"
         if: ${{ !cancelled() && inputs.upload-sarif == true }}
         uses: github/codeql-action/upload-sarif@407ffafae6a767df3e0230c3df91b6443ae8df75 # v2.22.8
         with:
           sarif_file: ${{ inputs.results-file-name }}
+      - name: "Error troubleshooter"
+        if: ${{ always() && steps.upload_artifact.outcome == 'failure' }}
+        run: |
+          echo "::error::Artifact upload failed. This is most likely caused by a error during scanning earlier in the workflow."
+

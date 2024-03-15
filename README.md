@@ -1,6 +1,6 @@
 # OSV-Scanner CI/CD Action
 
-[![Static Badge](https://img.shields.io/badge/release-v1.6.2--beta1-blue?style=flat)](https://github.com/google/osv-scanner-action/releases)
+[![Static Badge](https://img.shields.io/badge/release-v1.7.0--beta1-blue?style=flat)](https://github.com/google/osv-scanner-action/releases)
 <!-- Hard coded release version -->
 
 The OSV-Scanner CI/CD action leverages the [OSV.dev](https://osv.dev/) database and the [OSV-Scanner](https://google.github.io/osv-scanner/) CLI tool to track and notify you of known vulnerabilities in your dependencies for over 11 [languages and ecosystems](https://google.github.io/osv-scanner/supported-languages-and-lockfiles/).
@@ -15,7 +15,7 @@ Currently there is no prebuilt workflows for other platforms, but we welcome any
 ### Scheduled scan
 Regularly scanning your project for vulnerabilities can alert you to new vulnerabilities in your dependency tree. The scheduled scan will scan your project on a set schedule or when a new commit is pushed, and report all known vulnerabilities. If vulnerabilities are found it will be reported to the "Code scanning" page.
 
-|                          OSV-Scanner Code Scanning Results                           |                                 Code Scanning Detailed Entry                                  |
+|                        OSV-Scanner Code Scanning Results                         |                                 Code Scanning Detailed Entry                                  |
 | :------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------: |
 | ![Image of results in code scanning tab](images/github-action-code-scanning.png) | ![Image of details of specific in code scanning entry](images/github-action-code-details.png) |
 
@@ -36,11 +36,11 @@ Scanning your project on each pull request can help you keep vulnerabilities out
 
 ![Select the actions tab on the repository navigation bar.](./images/actions-tab.png)
 
-2) Scroll to the "Security actions" section and click on "View all". This will take you to a url in the form `https://www.github.com/{username}/{repository}/actions/new?category=security` 
+2) Scroll to the "Security actions" section and click on "View all". This will take you to a url in the form `https://www.github.com/{username}/{repository}/actions/new?category=security`
 
 ![Image indicates the location of the security actions section and the "view all" link.](./images/security-actions.png)
 
-3) Search for "OSV-Scanner". 
+3) Search for "OSV-Scanner".
 
 ![Image shows the GitHub Actions search bar.](./images/osv-scanner-search.png)
 
@@ -54,11 +54,11 @@ TODO: Insert image
 
 6) Configure the workflow
 
-The automatically installed GitHub Action includes functionality for both a [scheduled scan](#scheduled-scan) and a [scan on pull request](#scan-on-pull-request). 
+The automatically installed GitHub Action includes functionality for both a [scheduled scan](#scheduled-scan) and a [scan on pull request](#scan-on-pull-request).
 
-If you only want a scheduled scan, you can comment out the "scan-pr" job and only run the action on "schedule" and on "push". 
+If you only want a scheduled scan, you can comment out the "scan-pr" job and only run the action on "schedule" and on "push".
 
-If you only want to run a scan on pull request, you can comment out the "scan-scheduled" job and only run the action on "pull request" and "merge group". 
+If you only want to run a scan on pull request, you can comment out the "scan-scheduled" job and only run the action on "pull request" and "merge group".
 
 If you want both, you can leave the action as is. If you want these functionalities to be seperate for tracking purposes, we recommend following the [manual installation instructions](#manual-installation).  -->
 

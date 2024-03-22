@@ -13,4 +13,7 @@
 # limitations under the License.
 
 name: "osv-scanner"
-description: "Scans your directory against the OSV database. Please use the reusable workflow in .github/workflows/reusable/osv-scanner-reusable.yml"
+description: "Scans your dependencies against the OSV database for vulnerabilties."
+branding:
+  icon: 'alert-triangle'
+  color: 'red'

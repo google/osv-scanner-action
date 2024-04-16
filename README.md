@@ -28,31 +28,23 @@ Scanning your project on each pull request can help you keep vulnerabilities out
 
 ## Installation
 
-<!-- The OSV-Scanner GitHub Action can be [automatically](#automatic-installation) or [manually](#manual-installation) installed.  -->
+The OSV-Scanner GitHub Action can be [automatically](#automatic-installation) or [manually](#manual-installation) installed.
 
-<!-- ### Automatic installation
+### Automatic installation
 
 1) From your GitHub project's main page, click “Actions” tab in the navigation bar.
 
 ![Select the actions tab on the repository navigation bar.](./images/actions-tab.png)
 
-2) Scroll to the "Security actions" section and click on "View all". This will take you to a url in the form `https://www.github.com/{username}/{repository}/actions/new?category=security`
-
-![Image indicates the location of the security actions section and the "view all" link.](./images/security-actions.png)
-
-3) Search for "OSV-Scanner".
+2) Search for "OSV".
 
 ![Image shows the GitHub Actions search bar.](./images/osv-scanner-search.png)
 
-4) Choose the "OSV-Scanner" from the list of workflows, and then click “Configure”.
+3) Choose the "OSV Scanner" from the list of workflows, and then click “Configure”.
 
-TODO: Insert image
+![Image shows OSV Scanner workflow after searching](./images/osv-scanner-configure.png)
 
-5) Commit the changes.
-
-TODO: Insert image
-
-6) Configure the workflow
+4) Configure the workflow
 
 The automatically installed GitHub Action includes functionality for both a [scheduled scan](#scheduled-scan) and a [scan on pull request](#scan-on-pull-request).
 
@@ -60,7 +52,9 @@ If you only want a scheduled scan, you can comment out the "scan-pr" job and onl
 
 If you only want to run a scan on pull request, you can comment out the "scan-scheduled" job and only run the action on "pull request" and "merge group".
 
-If you want both, you can leave the action as is. If you want these functionalities to be seperate for tracking purposes, we recommend following the [manual installation instructions](#manual-installation).  -->
+If you want both, you can leave the action as is. If you want these functionalities to be separate for tracking purposes, we recommend following the [manual installation instructions](#manual-installation).
+
+5) Commit the changes.
 
 ### Manual installation
 

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base"
+  ],
+  "timezone": "Australia/Sydney",
+  "schedule": [
+    "before 6am on wednesday"
+  ],
+  "labels": [
+    "dependencies"
+  ],
+  "osvVulnerabilityAlerts": true,
+  "packageRules": [
+    {
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "enabled": true,
+      "groupName": "major-bump"
+    },
+    {
+      "matchFileNames": [
+        ".github/**"
+      ],
+      "groupName": "workflows"
+    }
+  ]
+}

@@ -62,7 +62,7 @@ jobs:
           name: "${{ inputs.download-artifact }}"
           path: "./"
       - name: "Run scanner"
-        uses: google/osv-scanner-action/osv-scanner-action@v1.7.1
+        uses: google/osv-scanner-action/osv-scanner-action@1f1242919d8a60496dd1874b24b62b2370ed4c78 # v1.7.1
         with:
           scan-args: |-
             --output=results.json
@@ -70,7 +70,7 @@ jobs:
             ${{ inputs.scan-args }}
         continue-on-error: true
       - name: "Run osv-scanner-reporter"
-        uses: google/osv-scanner-action/osv-reporter-action@v1.7.1
+        uses: google/osv-scanner-action/osv-reporter-action@1f1242919d8a60496dd1874b24b62b2370ed4c78 # v1.7.1
         with:
           scan-args: |-
             --output=${{ inputs.results-file-name }}

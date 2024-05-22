@@ -16,6 +16,7 @@
 name: "OSV-Scanner PR Scanning"
 
 permissions:
+  actions: read
   contents: read
   security-events: write
 

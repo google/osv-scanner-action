@@ -16,6 +16,7 @@
 name: "OSV-Scanner PR Scanning"
 
 permissions:
+  # Required to upload SARIF file to CodeQL. See: https://github.com/github/codeql-action/issues/2117
   actions: read
   contents: read
   security-events: write

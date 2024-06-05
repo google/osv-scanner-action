@@ -49,14 +49,14 @@ jobs:
   osv-scan:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
         with:
           fetch-depth: 0
           # Do persist credentials, as we need it for the git checkout later
       - name: "Checkout target branch"
         run: git checkout $GITHUB_BASE_REF
       - name: "Run scanner on existing code"
-        uses: google/osv-scanner-action/osv-scanner-action@75532bf0bf75464b047d80414dbce04449498365 # v1.7.3
+        uses: google/osv-scanner-action/osv-scanner-action@ba0b4d196d231340e0ae94ae00933c8be0984192 # v1.7.4
         continue-on-error: true
         with:
           scan-args: |-
@@ -66,7 +66,7 @@ jobs:
       - name: "Checkout current branch"
         run: git checkout $GITHUB_SHA
       - name: "Run scanner on new code"
-        uses: google/osv-scanner-action/osv-scanner-action@75532bf0bf75464b047d80414dbce04449498365 # v1.7.3
+        uses: google/osv-scanner-action/osv-scanner-action@ba0b4d196d231340e0ae94ae00933c8be0984192 # v1.7.4
         with:
           scan-args: |-
             --format=json
@@ -74,7 +74,7 @@ jobs:
             ${{ inputs.scan-args }}
         continue-on-error: true
       - name: "Run osv-scanner-reporter"
-        uses: google/osv-scanner-action/osv-reporter-action@75532bf0bf75464b047d80414dbce04449498365 # v1.7.3
+        uses: google/osv-scanner-action/osv-reporter-action@ba0b4d196d231340e0ae94ae00933c8be0984192 # v1.7.4
         with:
           scan-args: |-
             --output=${{ inputs.results-file-name }}
@@ -109,7 +109,7 @@ jobs:
       - name: "Upload to code-scanning"
         id: "upload_artifact"
         if: ${{ !cancelled() && inputs.upload-sarif == true }}
-        uses: github/codeql-action/upload-sarif@d39d31e687223d841ef683f52467bd88e9b21c14 # v3.25.3
+        uses: github/codeql-action/upload-sarif@2e230e8fe0ad3a14a340ad0815ddb96d599d2aff # v3.25.8
         with:
           sarif_file: ${{ inputs.results-file-name }}
       - name: "Error troubleshooter"

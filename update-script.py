@@ -2,6 +2,7 @@
 
 import subprocess
 import re
+import sys
 
 
 def cmd(command: list[str]) -> str:
@@ -23,7 +24,20 @@ def find_and_replace_regex_in_file(file_path: str, find_regex: str,
         file.write(filedata)
 
 
-target_tag = 'v1.8.1'
+def print_help():
+    print('update-script.py <target-tag>')
+
+
+if len(sys.argv) != 2:
+    print_help()
+    exit()
+
+target_tag = sys.argv[1]
+if not target_tag.startswith('v'):
+    print_help()
+    print('Target tag needs to begin with v')
+    exit()
+
 lastest_tag = cmd(['git', 'describe', '--tags', '--abbrev=0'])
 branch_name = cmd(['git', 'branch', '--show-current'])
 

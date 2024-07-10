@@ -56,7 +56,7 @@ jobs:
       - name: "Checkout target branch"
         run: git checkout $GITHUB_BASE_REF
       - name: "Run scanner on existing code"
-        uses: google/osv-scanner-action/osv-scanner-action@ba0b4d196d231340e0ae94ae00933c8be0984192 # v1.7.4
+        uses: google/osv-scanner-action/osv-scanner-action@cd72c04b43d9a3dbc85e56c1205e4d9b0e6a379b # v1.8.1
         continue-on-error: true
         with:
           scan-args: |-
@@ -66,7 +66,7 @@ jobs:
       - name: "Checkout current branch"
         run: git checkout $GITHUB_SHA
       - name: "Run scanner on new code"
-        uses: google/osv-scanner-action/osv-scanner-action@ba0b4d196d231340e0ae94ae00933c8be0984192 # v1.7.4
+        uses: google/osv-scanner-action/osv-scanner-action@cd72c04b43d9a3dbc85e56c1205e4d9b0e6a379b # v1.8.1
         with:
           scan-args: |-
             --format=json
@@ -74,7 +74,7 @@ jobs:
             ${{ inputs.scan-args }}
         continue-on-error: true
       - name: "Run osv-scanner-reporter"
-        uses: google/osv-scanner-action/osv-reporter-action@ba0b4d196d231340e0ae94ae00933c8be0984192 # v1.7.4
+        uses: google/osv-scanner-action/osv-reporter-action@cd72c04b43d9a3dbc85e56c1205e4d9b0e6a379b # v1.8.1
         with:
           scan-args: |-
             --output=${{ inputs.results-file-name }}

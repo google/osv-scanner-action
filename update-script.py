@@ -38,10 +38,14 @@ if not target_tag.startswith('v'):
     print('Target tag needs to begin with v')
     exit()
 
+cmd(['git', 'fetch', 'upstream'])
+
+print("fetched and checkout upstream/main")
+
 lastest_tag = cmd(['git', 'describe', '--tags', '--abbrev=0'])
 branch_name = cmd(['git', 'branch', '--show-current'])
 
-cmd(['git', 'checkout', '-b', 'update-to-' + target_tag])
+cmd(['git', 'checkout', '-b', 'update-to-' + target_tag, 'upstream/main'])
 
 find_and_replace_regex_in_file('osv-reporter-action/action.yml',
                                re.escape(lastest_tag), target_tag)
@@ -87,5 +91,3 @@ cmd([
     'git', 'commit', '-a', '-m',
     f'Update unified workflow example to point to {target_tag} reusable workflows'
 ])
-
-# cmd(['git', 'tag', target_tag, ])

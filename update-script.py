@@ -1,23 +1,36 @@
 #!/usr/bin/env python3
 
+"""
+Performs the three git commit required to do a release. See help output for more details.
+"""
+
 import subprocess
 import re
 import sys
 
 
 def cmd(command: list[str]) -> str:
-    return subprocess.run(command, capture_output=True,
-                          text=True).stdout.strip()
+    print('$ %s', ' '.join(command))
+    process = subprocess.run(command, capture_output=True, text=True)
+    if process.returncode != 0:
+        print('failed to run above command, got exit code: %d', process.returncode)
+        print('stderr: %s', process.stderr.strip())
+        exit(process.returncode)
+
+    output = process.stdout.strip()
+    print('# %s', output)
+    return output
 
 
 def find_and_replace_regex_in_file(file_path: str, find_regex: str,
                                    replace: str):
+
+    print('Performing find and replace on "%s": s/%s/%s', file_path, find_regex, replace)
     # Read in the file
     with open(file_path, 'r') as file:
         filedata = file.read()
 
     filedata = re.sub(find_regex, replace, filedata)
-    # filedata = filedata.replace(find, replace)
 
     # Write the file out again
     with open(file_path, 'w') as file:
@@ -26,6 +39,16 @@ def find_and_replace_regex_in_file(file_path: str, find_regex: str,
 
 def print_help():
     print('update-script.py <target-tag>')
+    print()
+    print('Performs a series of git merges to update all references of the previous version to the specified tag of osv-scanner. This script expects upstream remote to be named `upstream`')
+    print('1. Fetch upstream main branch')
+    print('2. Create new branch on the most recent version tag (the last release commit)')
+    print('3. Update references to the old osv-scanner tag to the new tag, and make the first commit')
+    print('4. Update references to the old .github/workflows/osv-scanner-reusable.yml version to the newly made commit in the last step. Make the second commit.')
+    print('5. Finally update the unified workflow to point to the commit made in step 4, perform the third commit.')
+    print()
+    print('After this script is complete, push the new branch and create a PR. This PR must be merged via a normal git merge commit, NOT a squash commit.')
+    print('Then create the new release tag on this merged PR commit.')
 
 
 if len(sys.argv) != 2:
@@ -39,7 +62,6 @@ if not target_tag.startswith('v'):
     exit()
 
 cmd(['git', 'fetch', 'upstream'])
-
 print("fetched and checkout upstream/main")
 
 lastest_tag = cmd(['git', 'describe', '--tags', '--abbrev=0'])
@@ -59,7 +81,7 @@ cmd([
 ])
 
 first_commit_hash = cmd(['git', 'rev-parse', 'HEAD'])
-print(first_commit_hash)
+print('First commit hash: %s', first_commit_hash)
 
 find_and_replace_regex_in_file(
     '.github/workflows/osv-scanner-reusable.yml',
@@ -79,7 +101,7 @@ cmd([
 ])
 
 second_commit_hash = cmd(['git', 'rev-parse', 'HEAD'])
-print(second_commit_hash)
+print('Second commit hash: %s', second_commit_hash)
 
 find_and_replace_regex_in_file(
     '.github/workflows/osv-scanner-unified-workflow.yml',
@@ -91,3 +113,5 @@ cmd([
     'git', 'commit', '-a', '-m',
     f'Update unified workflow example to point to {target_tag} reusable workflows'
 ])
+
+print('Success!')

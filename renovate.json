@@ -24,6 +24,10 @@
         ".github/**"
       ],
       "groupName": "workflows"
+    },
+    {
+      "matchPackageNames": ["google/osv-scanner-action"],
+      "enabled": false
     }
   ]
 }

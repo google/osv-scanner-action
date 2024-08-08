@@ -26,7 +26,7 @@
       "groupName": "workflows"
     },
     {
-      "matchPackageNames": ["osv-scanner-action"],
+      "matchPackageNames": ["google/osv-scanner-action"],
       "enabled": false
     }
   ]

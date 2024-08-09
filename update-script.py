@@ -38,17 +38,17 @@ def find_and_replace_regex_in_file(file_path: str, find_regex: str,
 
 
 def print_help():
-    print('update-script.py <target-tag>')
-    print()
-    print('Performs a series of git merges to update all references of the previous version to the specified tag of osv-scanner. This script expects upstream remote to be named `upstream`')
-    print('1. Fetch upstream main branch')
-    print('2. Create new branch on the most recent version tag (the last release commit)')
-    print('3. Update references to the old osv-scanner tag to the new tag, and make the first commit')
-    print('4. Update references to the old .github/workflows/osv-scanner-reusable.yml version to the newly made commit in the last step. Make the second commit.')
-    print('5. Finally update the unified workflow to point to the commit made in step 4, perform the third commit.')
-    print()
-    print('After this script is complete, push the new branch and create a PR. This PR must be merged via a normal git merge commit, NOT a squash commit.')
-    print('Then create the new release tag on this merged PR commit.')
+    print('''update-script.py <target-tag>
+
+Performs a series of git merges to update all references of the previous version to the specified tag of osv-scanner. This script expects upstream remote to be named `upstream`
+1. Fetch upstream main branch
+2. Create new branch on the most recent version tag (the last release commit)
+3. Update references to the old osv-scanner tag to the new tag, and make the first commit
+4. Update references to the old .github/workflows/osv-scanner-reusable.yml version to the newly made commit in the last step. Make the second commit.
+5. Finally update the unified workflow to point to the commit made in step 4, perform the third commit.
+
+After this script is complete, push the new branch and create a PR. This PR must be merged via a normal git merge commit, NOT a squash commit.
+Then create the new release tag on this merged PR commit.''')
 
 
 if len(sys.argv) != 2:

@@ -10,22 +10,22 @@ import sys
 
 
 def cmd(command: list[str]) -> str:
-    print('$ %s', ' '.join(command))
+    print('$ ' + ' '.join(command))
     process = subprocess.run(command, capture_output=True, text=True)
     if process.returncode != 0:
         print('failed to run above command, got exit code: %d', process.returncode)
-        print('stderr: %s', process.stderr.strip())
+        print('stderr: ' + process.stderr.strip())
         exit(process.returncode)
 
     output = process.stdout.strip()
-    print('# %s', output)
+    print('# ' + output)
     return output
 
 
 def find_and_replace_regex_in_file(file_path: str, find_regex: str,
                                    replace: str):
 
-    print('Performing find and replace on "%s": s/%s/%s', file_path, find_regex, replace)
+    print(f'Performing find and replace on "{file_path}": s/{find_regex}/{replace}')
     # Read in the file
     with open(file_path, 'r') as file:
         filedata = file.read()
@@ -81,7 +81,7 @@ cmd([
 ])
 
 first_commit_hash = cmd(['git', 'rev-parse', 'HEAD'])
-print('First commit hash: %s', first_commit_hash)
+print('First commit hash: ' + first_commit_hash)
 
 find_and_replace_regex_in_file(
     '.github/workflows/osv-scanner-reusable.yml',
@@ -101,7 +101,7 @@ cmd([
 ])
 
 second_commit_hash = cmd(['git', 'rev-parse', 'HEAD'])
-print('Second commit hash: %s', second_commit_hash)
+print('Second commit hash: ' + second_commit_hash)
 
 find_and_replace_regex_in_file(
     '.github/workflows/osv-scanner-unified-workflow.yml',

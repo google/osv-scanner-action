@@ -64,7 +64,8 @@ jobs:
             --output=old-results.json
             ${{ inputs.scan-args }}
       - name: "Checkout current branch"
-        run: git checkout $GITHUB_SHA
+        # Use -f in case any changes were made by osv-scanner (there should be no changes)
+        run: git checkout -f $GITHUB_SHA
       - name: "Run scanner on new code"
         uses: google/osv-scanner-action/osv-scanner-action@01ff5d1fb3f81ce02671051bcbef67347b5c6200 # v1.8.3
         with:

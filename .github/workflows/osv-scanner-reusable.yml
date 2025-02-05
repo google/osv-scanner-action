@@ -49,6 +49,10 @@ on:
         description: "Whether to fail the action on vulnerability found"
         type: boolean
         default: true
+      matrix-property:
+        description: "Optional string for matrix strategies (E.g. 'amd64-')"
+        type: string
+        default: ""
 
 jobs:
   osv-scan:
@@ -67,7 +71,7 @@ jobs:
         uses: google/osv-scanner-action/osv-scanner-action@f8115f2f28022984d4e8070d2f0f85abcf6f3458 # v1.9.2
         with:
           scan-args: |-
-            --output=results.json
+            --output=${{ inputs.matrix-property }}results.json
             --format=json
             ${{ inputs.scan-args }}
         continue-on-error: true
@@ -75,8 +79,8 @@ jobs:
         uses: google/osv-scanner-action/osv-reporter-action@f8115f2f28022984d4e8070d2f0f85abcf6f3458 # v1.9.2
         with:
           scan-args: |-
-            --output=${{ inputs.results-file-name }}
-            --new=results.json
+            --output=${{ inputs.matrix-property }}${{ inputs.results-file-name }}
+            --new=${{ inputs.matrix-property }}results.json
             --gh-annotations=false
             --fail-on-vuln=${{ inputs.fail-on-vuln }}
       # Upload the results as artifacts (optional). Commenting out will disable uploads of run results in SARIF
@@ -86,15 +90,15 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
         with:
-          name: SARIF file
-          path: ${{ inputs.results-file-name }}
+          name: ${{ inputs.matrix-property }}SARIF file
+          path: ${{ inputs.matrix-property }}${{ inputs.results-file-name }}
           retention-days: 5
       # Upload the results to GitHub's code scanning dashboard.
       - name: "Upload to code-scanning"
         if: "${{ !cancelled() && inputs.upload-sarif == true }}"
         uses: github/codeql-action/upload-sarif@dd746615b3b9d728a6a37ca2045b68ca76d4841a # v3.28.8
         with:
-          sarif_file: ${{ inputs.results-file-name }}
+          sarif_file: ${{ inputs.matrix-property }}${{ inputs.results-file-name }}
       - name: "Error troubleshooter"
         if: ${{ always() && steps.upload_artifact.outcome == 'failure' }}
         run: |

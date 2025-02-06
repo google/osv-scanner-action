@@ -53,6 +53,10 @@ on:
         description: "Optional string for matrix strategies (E.g. 'amd64-')"
         type: string
         default: ""
+      checkout-submodules:
+        description: "Whether to check out submodules or not. Passed on to `submodules` argument of `actions/checkout`"
+        type: boolean
+        default: false
 
 jobs:
   osv-scan:
@@ -61,6 +65,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           persist-credentials: false
+          submodules: ${{ inputs.checkout-submodules }}
       - name: "Download custom artifact if specified"
         uses: actions/download-artifact@v4
         if: "${{ inputs.download-artifact != '' }}"

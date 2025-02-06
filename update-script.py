@@ -25,7 +25,7 @@ def cmd(command: list[str]) -> str:
 def find_and_replace_regex_in_file(file_path: str, find_regex: str,
                                    replace: str):
 
-    print(f'Performing find and replace on "{file_path}": s/{find_regex}/{replace}')
+    print(f'Performing find and replace on "{file_path}": s/"{find_regex}"/"{replace}"')
     # Read in the file
     with open(file_path, 'r') as file:
         filedata = file.read()

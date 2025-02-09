@@ -48,6 +48,10 @@ on:
           description: "Optional string for matrix strategies (E.g. 'amd64-')"
           type: string
           default: ""
+      checkout-submodules:
+        description: "Whether to check out submodules or not. Passed on to `submodules` argument of `actions/checkout`"
+        type: boolean
+        default: false
 
 jobs:
   osv-scan:
@@ -56,9 +60,12 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           fetch-depth: 0
+          submodules: ${{ inputs.checkout-submodules }}
           # Do persist credentials, as we need it for the git checkout later
       - name: "Checkout target branch"
-        run: git checkout $GITHUB_BASE_REF
+        run: |
+          git checkout $GITHUB_BASE_REF
+          git submodule update --recursive
       - name: "Run scanner on existing code"
         uses: google/osv-scanner-action/osv-scanner-action@f8115f2f28022984d4e8070d2f0f85abcf6f3458 # v1.9.2
         continue-on-error: true
@@ -69,7 +76,9 @@ jobs:
             ${{ inputs.scan-args }}
       - name: "Checkout current branch"
         # Use -f in case any changes were made by osv-scanner (there should be no changes)
-        run: git checkout -f $GITHUB_SHA
+        run: |
+          git checkout -f $GITHUB_SHA
+          git submodule update --recursive
       - name: "Run scanner on new code"
         uses: google/osv-scanner-action/osv-scanner-action@f8115f2f28022984d4e8070d2f0f85abcf6f3458 # v1.9.2
         with:

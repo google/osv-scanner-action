@@ -20,7 +20,6 @@ inputs:
   scan-args:
     description: "Arguments to osv-scanner, separated by new line"
     default: |-
-      --skip-git
       --recursive
       ./
 runs:

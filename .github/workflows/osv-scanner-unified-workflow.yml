@@ -39,6 +39,7 @@ jobs:
     with:
       # Example of specifying custom arguments
       scan-args: |-
+        --include-git-root
         -r
         ./
   scan-pr:
@@ -47,5 +48,6 @@ jobs:
     with:
       # Example of specifying custom arguments
       scan-args: |-
+        --include-git-root
         -r
         ./

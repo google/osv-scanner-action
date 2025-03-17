@@ -1,14 +1,14 @@
 # OSV-Scanner CI/CD Action
 
-[![Release v2.0.0-beta2](https://img.shields.io/badge/release-v2.0.0--beta2-blue?style=flat)](https://github.com/google/osv-scanner-action/releases)
+[![Release v2.0.0](https://img.shields.io/badge/release-v2.0.0-blue?style=flat)](https://github.com/google/osv-scanner-action/releases)
 <!-- Hard coded release version -->
 
 The OSV-Scanner CI/CD action leverages the [OSV.dev](https://osv.dev/) database and the [OSV-Scanner](https://google.github.io/osv-scanner/) CLI tool to track and notify you of known vulnerabilities in your dependencies for over 11 [languages and ecosystems](https://google.github.io/osv-scanner/supported-languages-and-lockfiles/).
 
 We currently offer two different reusable workflows for Github:
 
-1. A workflow that triggers a scan with each [pull request](./github-action.md#scan-on-pull-request) and will only report new vulnerabilities introduced through the pull request.
-2. A workflow that performs a full vulnerability scan, which can be configured to scan on pushes or a [regular schedule](./github-action.md#scheduled-scans). The full vulnerability scan can also be configured to run [on release](./github-action.md#scan-on-release) to prevent releasing with known vulnerabilities in dependencies.
+1. A workflow that triggers a scan with each [pull request](https://google.github.io/osv-scanner/github-action/#scan-on-pull-request) and will only report new vulnerabilities introduced through the pull request.
+2. A workflow that performs a full vulnerability scan, which can be configured to scan on pushes or a [regular schedule](https://google.github.io/osv-scanner/github-action/#scheduled-scans). The full vulnerability scan can also be configured to run [on release](https://google.github.io/osv-scanner/github-action/#scan-on-release) to prevent releasing with known vulnerabilities in dependencies.
 
 Currently there is no prebuilt workflows for other platforms, but we welcome any contributions for this!
 

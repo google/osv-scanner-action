@@ -99,21 +99,21 @@ jobs:
       # format to the repository Actions tab.
       - name: "Upload artifact"
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: SARIF file
           path: ${{ inputs.matrix-property }}${{ inputs.results-file-name }}
           retention-days: 5
       - name: "Upload old scan json results"
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: ${{ inputs.matrix-property }}old-json-results
           path: ${{ inputs.matrix-property }}old-results.json
           retention-days: 5
       - name: "Upload new scan json results"
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: ${{ inputs.matrix-property }}new-json-results
           path: ${{ inputs.matrix-property }}new-results.json
@@ -122,7 +122,7 @@ jobs:
       - name: "Upload to code-scanning"
         id: "upload_artifact"
         if: ${{ !cancelled() && inputs.upload-sarif == true }}
-        uses: github/codeql-action/upload-sarif@6bb031afdd8eb862ea3fc1848194185e076637e5 # v3.28.11
+        uses: github/codeql-action/upload-sarif@45775bd8235c68ba998cffa5171334d58593da47 # v3.28.15
         with:
           sarif_file: ${{ inputs.matrix-property }}${{ inputs.results-file-name }}
       - name: "Error troubleshooter"

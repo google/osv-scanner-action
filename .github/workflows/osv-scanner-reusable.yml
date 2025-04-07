@@ -56,6 +56,10 @@ on:
         description: "Whether to check out submodules or not. Passed on to `submodules` argument of `actions/checkout`"
         type: boolean
         default: false
+      ref:
+        description: "Whether to checkout a custom branch/tag/commit for scanning other than the default branch"
+        type: string
+        default: ""
 
 jobs:
   osv-scan:
@@ -65,6 +69,7 @@ jobs:
         with:
           persist-credentials: false
           submodules: ${{ inputs.checkout-submodules }}
+          ref: ${{ inputs.ref }}
       - name: "Download custom artifact if specified"
         uses: actions/download-artifact@v4
         if: "${{ inputs.download-artifact != '' }}"

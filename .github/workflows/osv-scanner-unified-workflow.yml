@@ -35,7 +35,7 @@ permissions:
 jobs:
   scan-scheduled:
     if: ${{ github.event_name == 'push' || github.event_name == 'schedule' }}
-    uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@afa2aef66399b657ea10657432914835474a8882" # v2.0.1
+    uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@840c9d67af0fb6415e5969ba5516f234828b21cf" # v2.0.2
     with:
       # Example of specifying custom arguments
       scan-args: |-
@@ -44,7 +44,7 @@ jobs:
         ./
   scan-pr:
     if: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' }}
-    uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable-pr.yml@afa2aef66399b657ea10657432914835474a8882" # v2.0.1
+    uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable-pr.yml@840c9d67af0fb6415e5969ba5516f234828b21cf" # v2.0.2
     with:
       # Example of specifying custom arguments
       scan-args: |-

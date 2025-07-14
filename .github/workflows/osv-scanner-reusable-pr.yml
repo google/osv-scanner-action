@@ -66,7 +66,7 @@ jobs:
           git checkout $GITHUB_BASE_REF
           git submodule update --recursive
       - name: "Run scanner on existing code"
-        uses: google/osv-scanner-action/osv-scanner-action@2b64df4bbbe4e55a3a6cab3362485fbfaec5a2f8 # v2.0.3
+        uses: google/osv-scanner-action/osv-scanner-action@ce923d29da58ad12e6a700ddb9879fb7ecd1878e # v2.1.0
         continue-on-error: true
         with:
           scan-args: |-
@@ -79,7 +79,7 @@ jobs:
           git checkout -f $GITHUB_SHA
           git submodule update --recursive
       - name: "Run scanner on new code"
-        uses: google/osv-scanner-action/osv-scanner-action@2b64df4bbbe4e55a3a6cab3362485fbfaec5a2f8 # v2.0.3
+        uses: google/osv-scanner-action/osv-scanner-action@ce923d29da58ad12e6a700ddb9879fb7ecd1878e # v2.1.0
         with:
           scan-args: |-
             --format=json
@@ -87,7 +87,7 @@ jobs:
             ${{ inputs.scan-args }}
         continue-on-error: true
       - name: "Run osv-scanner-reporter"
-        uses: google/osv-scanner-action/osv-reporter-action@2b64df4bbbe4e55a3a6cab3362485fbfaec5a2f8 # v2.0.3
+        uses: google/osv-scanner-action/osv-reporter-action@ce923d29da58ad12e6a700ddb9879fb7ecd1878e # v2.1.0
         with:
           scan-args: |-
             --output=${{ inputs.matrix-property }}${{ inputs.results-file-name }}

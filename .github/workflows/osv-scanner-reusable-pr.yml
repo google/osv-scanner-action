@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#      http://www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -125,8 +125,12 @@ jobs:
         uses: github/codeql-action/upload-sarif@ce28f5bb42b7a9f2c824e633a3f6ee835bab6858 # v3.29.0
         with:
           sarif_file: ${{ inputs.matrix-property }}${{ inputs.results-file-name }}
+      - name: "Print Code Scanning PR URL"
+        if: "${{ !cancelled() && inputs.upload-sarif == true }}"
+        run: |
+          echo "View the OSV-Scanner results for this PR in the 'Security' tab, using the following link:"
+          echo "${{ github.server_url }}/${{ github.repository }}/security/code-scanning?query=pr%3A${{ github.event.pull_request.number }}"
       - name: "Error troubleshooter"
         if: ${{ always() && steps.upload_artifact.outcome == 'failure' }}
         run: |
           echo "::error::Artifact upload failed. This is most likely caused by a error during scanning earlier in the workflow."
-

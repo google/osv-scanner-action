@@ -77,7 +77,7 @@ find_and_replace_regex_in_file('README.md', re.escape(lastest_tag), target_tag)
 
 cmd([
     'git', 'commit', '-a', '-m',
-    f'Update actions to use {target_tag} osv-scanner image'
+    f'"Update actions to use {target_tag} osv-scanner image"'
 ])
 
 first_commit_hash = cmd(['git', 'rev-parse', 'HEAD'])

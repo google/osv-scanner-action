@@ -67,17 +67,17 @@ print("fetched and checkout upstream/main")
 if len(sys.argv) == 3:
     latest_tag = sys.argv[2]
 else:
-    lastest_tag = cmd(['git', 'describe', '--tags', '--abbrev=0'])
+    latest_tag = cmd(['git', 'describe', '--tags', '--abbrev=0'])
 
 branch_name = cmd(['git', 'branch', '--show-current'])
 
 cmd(['git', 'checkout', '-b', 'update-to-' + target_tag, 'upstream/main'])
 
 find_and_replace_regex_in_file('osv-reporter-action/action.yml',
-                               re.escape(lastest_tag), target_tag)
+                               re.escape(latest_tag), target_tag)
 find_and_replace_regex_in_file('osv-scanner-action/action.yml',
-                               re.escape(lastest_tag), target_tag)
-find_and_replace_regex_in_file('README.md', re.escape(lastest_tag), target_tag)
+                               re.escape(latest_tag), target_tag)
+find_and_replace_regex_in_file('README.md', re.escape(latest_tag), target_tag)
 
 cmd([
     'git', 'commit', '-a', '-m',

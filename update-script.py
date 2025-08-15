@@ -38,7 +38,7 @@ def find_and_replace_regex_in_file(file_path: str, find_regex: str,
 
 
 def print_help():
-    print('''update-script.py <target-tag>
+    print('''update-script.py <target-tag> <optional:previous-tag>
 
 Performs a series of git merges to update all references of the previous version to the specified tag of osv-scanner. This script expects upstream remote to be named `upstream`
 1. Fetch upstream main branch
@@ -51,7 +51,7 @@ After this script is complete, push the new branch and create a PR. This PR must
 Then create the new release tag on this merged PR commit.''')
 
 
-if len(sys.argv) != 2:
+if len(sys.argv) != 2 and len(sys.argv) != 3:
     print_help()
     exit()
 
@@ -64,16 +64,20 @@ if not target_tag.startswith('v'):
 cmd(['git', 'fetch', 'upstream'])
 print("fetched and checkout upstream/main")
 
-lastest_tag = cmd(['git', 'describe', '--tags', '--abbrev=0'])
+if len(sys.argv) == 3:
+    latest_tag = sys.argv[2]
+else:
+    latest_tag = cmd(['git', 'describe', '--tags', '--abbrev=0'])
+
 branch_name = cmd(['git', 'branch', '--show-current'])
 
 cmd(['git', 'checkout', '-b', 'update-to-' + target_tag, 'upstream/main'])
 
 find_and_replace_regex_in_file('osv-reporter-action/action.yml',
-                               re.escape(lastest_tag), target_tag)
+                               re.escape(latest_tag), target_tag)
 find_and_replace_regex_in_file('osv-scanner-action/action.yml',
-                               re.escape(lastest_tag), target_tag)
-find_and_replace_regex_in_file('README.md', re.escape(lastest_tag), target_tag)
+                               re.escape(latest_tag), target_tag)
+find_and_replace_regex_in_file('README.md', re.escape(latest_tag), target_tag)
 
 cmd([
     'git', 'commit', '-a', '-m',

@@ -51,7 +51,7 @@ After this script is complete, push the new branch and create a PR. This PR must
 Then create the new release tag on this merged PR commit.''')
 
 
-if len(sys.argv) != 2 && len(sys.argv) != 3:
+if len(sys.argv) != 2 and len(sys.argv) != 3:
     print_help()
     exit()
 

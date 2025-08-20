@@ -36,15 +36,17 @@ The OSV-Scanner GitHub Action can be [automatically](#automatic-installation) or
 
 ![Select the actions tab on the repository navigation bar.](./images/actions-tab.png)
 
-2) Search for "OSV".
+2) (If you already have existing workflows) Select "New Workflow" on the top left.
+
+3) Search for "OSV".
 
 ![Image shows the GitHub Actions search bar.](./images/osv-scanner-search.png)
 
-3) Choose the "OSV Scanner" from the list of workflows, and then click “Configure”.
+4) Choose the "OSV Scanner" from the list of workflows, and then click “Configure”.
 
 ![Image shows OSV Scanner workflow after searching](./images/osv-scanner-configure.png)
 
-4) Configure the workflow
+5) Configure the workflow
 
 The automatically installed GitHub Action includes functionality for both a [scheduled scan](#scheduled-scan) and a [scan on pull request](#scan-on-pull-request).
 

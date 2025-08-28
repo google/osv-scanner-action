@@ -77,7 +77,7 @@ jobs:
           name: "${{ inputs.download-artifact }}"
           path: "./"
       - name: "Run scanner"
-        uses: google/osv-scanner-action/osv-scanner-action@23f8850c0f6fc96b3324529b3f30665d63391634 # v2.2.2
+        uses: ../../osv-scanner-action
         with:
           scan-args: |-
             --output=${{ inputs.matrix-property }}results.json
@@ -85,7 +85,7 @@ jobs:
             ${{ inputs.scan-args }}
         continue-on-error: true
       - name: "Run osv-scanner-reporter"
-        uses: google/osv-scanner-action/osv-reporter-action@23f8850c0f6fc96b3324529b3f30665d63391634 # v2.2.2
+        uses: ../../osv-reporter-action
         with:
           scan-args: |-
             --output=${{ inputs.matrix-property }}${{ inputs.results-file-name }}
@@ -118,3 +118,4 @@ jobs:
         run: |
           echo "::error::Artifact upload failed. This is most likely caused by a error during scanning earlier in the workflow."
           exit 1
+          

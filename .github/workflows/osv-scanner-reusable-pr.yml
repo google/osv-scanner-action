@@ -44,17 +44,27 @@ on:
         type: boolean
         default: true
       matrix-property:
-          description: "Optional string for matrix strategies (E.g. 'amd64-')"
-          type: string
-          default: ""
+        description: "Optional string for matrix strategies (E.g. 'amd64-')"
+        type: string
+        default: ""
       checkout-submodules:
         description: "Whether to check out submodules or not. Passed on to `submodules` argument of `actions/checkout`"
         type: boolean
         default: false
+    outputs:
+      old-results:
+        description: "Results of the scan before the PR in JSON format (Base64 encoded)"
+        value: ${{ jobs.osv-scan.outputs.old-results }}
+      new-results:
+        description: "Results of the scan after the PR in JSON format (Base64 encoded)"
+        value: ${{ jobs.osv-scan.outputs.new-results }}
 
 jobs:
   osv-scan:
     runs-on: ubuntu-latest
+    outputs:
+      old-results: ${{ steps.export.outputs.old-results }}
+      new-results: ${{ steps.export.outputs.new-results }}
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
@@ -86,6 +96,11 @@ jobs:
             --output=${{ inputs.matrix-property }}new-results.json
             ${{ inputs.scan-args }}
         continue-on-error: true
+      - name: "Export results"
+        id: export
+        run: |
+          echo "old-results=$(cat ${{ inputs.matrix-property }}old-results.json | jq -c . | base64 -w0)" >> $GITHUB_OUTPUT
+          echo "new-results=$(cat ${{ inputs.matrix-property }}new-results.json | jq -c . | base64 -w0)" >> $GITHUB_OUTPUT
       - name: "Run osv-scanner-reporter"
         uses: google/osv-scanner-action/osv-reporter-action@23f8850c0f6fc96b3324529b3f30665d63391634 # v2.2.2
         with:

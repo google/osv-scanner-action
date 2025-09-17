@@ -60,10 +60,16 @@ on:
         description: "Whether to checkout a custom branch/tag/commit for scanning other than the default branch"
         type: string
         default: ""
+    outputs:
+      results:
+        description: "Results of the scan in JSON format (Base64 encoded)"
+        value: ${{ jobs.osv-scan.outputs.results }}
 
 jobs:
   osv-scan:
     runs-on: ubuntu-latest
+    outputs:
+      results: ${{ steps.export.outputs.results }}
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
@@ -84,6 +90,9 @@ jobs:
             --format=json
             ${{ inputs.scan-args }}
         continue-on-error: true
+      - name: "Export results"
+        id: export
+        run: echo "results=$(cat ${{ inputs.matrix-property }}results.json | jq -c . | base64 -w0)" >> $GITHUB_OUTPUT
       - name: "Run osv-scanner-reporter"
         uses: google/osv-scanner-action/osv-reporter-action@23f8850c0f6fc96b3324529b3f30665d63391634 # v2.2.2
         with:

@@ -83,7 +83,7 @@ jobs:
           name: "${{ inputs.download-artifact }}"
           path: "./"
       - name: "Run scanner"
-        uses: google/osv-scanner-action/osv-scanner-action@23f8850c0f6fc96b3324529b3f30665d63391634 # v2.2.2
+        uses: google/osv-scanner-action/osv-scanner-action@d510e7d909b203e4aa41380fa1e74c20cad9fadf # v2.2.4
         with:
           scan-args: |-
             --output=${{ inputs.matrix-property }}results.json
@@ -94,7 +94,7 @@ jobs:
         id: export
         run: echo "results=$(cat ${{ inputs.matrix-property }}results.json | jq -c . | base64 -w0)" >> $GITHUB_OUTPUT
       - name: "Run osv-scanner-reporter"
-        uses: google/osv-scanner-action/osv-reporter-action@23f8850c0f6fc96b3324529b3f30665d63391634 # v2.2.2
+        uses: google/osv-scanner-action/osv-reporter-action@d510e7d909b203e4aa41380fa1e74c20cad9fadf # v2.2.4
         with:
           scan-args: |-
             --output=${{ inputs.matrix-property }}${{ inputs.results-file-name }}
@@ -114,7 +114,7 @@ jobs:
       # Upload the results to GitHub's code scanning dashboard.
       - name: "Upload to code-scanning"
         if: "${{ !cancelled() && inputs.upload-sarif == true }}"
-        uses: github/codeql-action/upload-sarif@3c3833e0f8c1c83d449a7478aa59c036a9165498 # v3.29.11
+        uses: github/codeql-action/upload-sarif@f443b600d91635bebf5b0d9ebc620189c0d6fba5 # v4.30.8
         with:
           sarif_file: ${{ inputs.matrix-property }}${{ inputs.results-file-name }}
       - name: "Print Code Scanning URL"

@@ -96,11 +96,6 @@ jobs:
             --output=${{ inputs.matrix-property }}new-results.json
             ${{ inputs.scan-args }}
         continue-on-error: true
-      - name: "Export results"
-        id: export
-        run: |
-          echo "old-results=$(cat ${{ inputs.matrix-property }}old-results.json | jq -c . | base64 -w0)" >> $GITHUB_OUTPUT
-          echo "new-results=$(cat ${{ inputs.matrix-property }}new-results.json | jq -c . | base64 -w0)" >> $GITHUB_OUTPUT
       - name: "Run osv-scanner-reporter"
         uses: google/osv-scanner-action/osv-reporter-action@d510e7d909b203e4aa41380fa1e74c20cad9fadf # v2.2.4
         with:
@@ -110,6 +105,20 @@ jobs:
             --new=${{ inputs.matrix-property }}new-results.json
             --gh-annotations=true
             --fail-on-vuln=${{ inputs.fail-on-vuln }}
+      - name: "Export results"
+        id: export
+        run: |
+          DELIMITER="EOF_$(tr -dc 'a-zA-Z0-9' < /dev/urandom 2>/dev/null | head -c 16)"
+          if [ -f ${{ inputs.matrix-property }}old-results.json ]; then
+            echo "old-results<<${DELIMITER}" >> "${GITHUB_OUTPUT}"
+            cat ${{ inputs.matrix-property }}old-results.json >> "${GITHUB_OUTPUT}"
+            echo "${DELIMITER}" >> "${GITHUB_OUTPUT}"
+          fi
+          if [ -f ${{ inputs.matrix-property }}new-results.json ]; then
+            echo "new-results<<${DELIMITER}" >> "${GITHUB_OUTPUT}"
+            cat ${{ inputs.matrix-property }}new-results.json >> "${GITHUB_OUTPUT}"
+            echo "${DELIMITER}" >> "${GITHUB_OUTPUT}"
+          fi
       # Upload the results as artifacts (optional). Commenting out will disable uploads of run results in SARIF
       # format to the repository Actions tab.
       - name: "Upload artifact"

@@ -99,21 +99,21 @@ jobs:
       # format to the repository Actions tab.
       - name: "Upload artifact"
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: SARIF file
           path: ${{ inputs.matrix-property }}${{ inputs.results-file-name }}
           retention-days: 5
       - name: "Upload old scan json results"
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: ${{ inputs.matrix-property }}old-json-results
           path: ${{ inputs.matrix-property }}old-results.json
           retention-days: 5
       - name: "Upload new scan json results"
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: ${{ inputs.matrix-property }}new-json-results
           path: ${{ inputs.matrix-property }}new-results.json

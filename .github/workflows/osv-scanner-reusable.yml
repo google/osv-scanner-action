@@ -71,19 +71,19 @@ jobs:
     outputs:
       results: ${{ steps.export.outputs.results }}
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
         with:
           persist-credentials: false
           submodules: ${{ inputs.checkout-submodules }}
           ref: ${{ inputs.ref }}
       - name: "Download custom artifact if specified"
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         if: "${{ inputs.download-artifact != '' }}"
         with:
           name: "${{ inputs.download-artifact }}"
           path: "./"
       - name: "Run scanner"
-        uses: google/osv-scanner-action/osv-scanner-action@d510e7d909b203e4aa41380fa1e74c20cad9fadf # v2.2.4
+        uses: google/osv-scanner-action/osv-scanner-action@9ca325867d8b4f9a3ccd4a0ca372e3cc7fcee3ef # v2.3.0
         with:
           scan-args: |-
             --output=${{ inputs.matrix-property }}results.json
@@ -91,7 +91,7 @@ jobs:
             ${{ inputs.scan-args }}
         continue-on-error: true
       - name: "Run osv-scanner-reporter"
-        uses: google/osv-scanner-action/osv-reporter-action@d510e7d909b203e4aa41380fa1e74c20cad9fadf # v2.2.4
+        uses: google/osv-scanner-action/osv-reporter-action@9ca325867d8b4f9a3ccd4a0ca372e3cc7fcee3ef # v2.3.0
         with:
           scan-args: |-
             --output=${{ inputs.matrix-property }}${{ inputs.results-file-name }}
@@ -112,7 +112,7 @@ jobs:
       - name: "Upload artifact"
         id: "upload_artifact"
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: ${{ inputs.matrix-property }}SARIF file
           path: ${{ inputs.matrix-property }}${{ inputs.results-file-name }}
@@ -120,7 +120,7 @@ jobs:
       # Upload the results to GitHub's code scanning dashboard.
       - name: "Upload to code-scanning"
         if: "${{ !cancelled() && inputs.upload-sarif == true }}"
-        uses: github/codeql-action/upload-sarif@f443b600d91635bebf5b0d9ebc620189c0d6fba5 # v4.30.8
+        uses: github/codeql-action/upload-sarif@014f16e7ab1402f30e7c3329d33797e7948572db # v4.31.3
         with:
           sarif_file: ${{ inputs.matrix-property }}${{ inputs.results-file-name }}
       - name: "Print Code Scanning URL"

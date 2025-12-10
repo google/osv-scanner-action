@@ -101,7 +101,7 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
-          name: SARIF file
+          name: OSV Scanner SARIF file
           path: ${{ inputs.matrix-property }}${{ inputs.results-file-name }}
           retention-days: 5
       - name: "Upload old scan json results"

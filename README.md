@@ -1,6 +1,6 @@
 # OSV-Scanner CI/CD Action
 
-[![Release v2.3.1](https://img.shields.io/badge/release-v2.3.1-blue?style=flat)](https://github.com/google/osv-scanner-action/releases)
+[![Release v2.3.2](https://img.shields.io/badge/release-v2.3.2-blue?style=flat)](https://github.com/google/osv-scanner-action/releases)
 <!-- Hard coded release version -->
 
 The OSV-Scanner CI/CD action leverages the [OSV.dev](https://osv.dev/) database and the [OSV-Scanner](https://google.github.io/osv-scanner/) CLI tool to track and notify you of known vulnerabilities in your dependencies for over 11 [languages and ecosystems](https://google.github.io/osv-scanner/supported-languages-and-lockfiles/).

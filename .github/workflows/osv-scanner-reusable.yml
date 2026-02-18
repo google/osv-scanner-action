@@ -113,6 +113,8 @@ jobs:
         run: |
           echo "View the OSV-Scanner results in the 'Security' tab, using the following link:"
           echo "${{ github.server_url }}/${{ github.repository }}/security/code-scanning?query=is%3Aopen+branch%3A${GITHUB_REF_NAME}+tool%3Aosv-scanner"
+        env:
+          GITHUB_REF_NAME: ${{ github.ref_name }}
       - name: "Error troubleshooter"
         if: ${{ always() && steps.upload_artifact.outcome == 'failure' }}
         run: |

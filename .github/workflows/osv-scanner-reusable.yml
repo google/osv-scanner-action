@@ -60,10 +60,16 @@ on:
         description: "Whether to checkout a custom branch/tag/commit for scanning other than the default branch"
         type: string
         default: ""
+    outputs:
+      results:
+        description: "Results of the scan in JSON format (Base64 encoded)"
+        value: ${{ jobs.osv-scan.outputs.results }}
 
 jobs:
   osv-scan:
     runs-on: ubuntu-latest
+    outputs:
+      results: ${{ steps.export.outputs.results }}
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
@@ -92,6 +98,15 @@ jobs:
             --new=${{ inputs.matrix-property }}results.json
             --gh-annotations=false
             --fail-on-vuln=${{ inputs.fail-on-vuln }}
+      - name: "Export results"
+        id: export
+        run: |
+          if [ -f ${{ inputs.matrix-property }}osv-results.json ]; then
+            DELIMITER="EOF_$(tr -dc 'a-zA-Z0-9' < /dev/urandom 2>/dev/null | head -c 16)"
+            echo "results<<${DELIMITER}" >> "${GITHUB_OUTPUT}"
+            cat ${{ inputs.matrix-property }}osv-results.json >> "${GITHUB_OUTPUT}"
+            echo "${DELIMITER}" >> "${GITHUB_OUTPUT}"
+          fi
       # Upload the results as artifacts (optional). Commenting out will disable uploads of run results in SARIF
       # format to the repository Actions tab.
       - name: "Upload artifact"

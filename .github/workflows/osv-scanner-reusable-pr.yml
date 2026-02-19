@@ -44,17 +44,27 @@ on:
         type: boolean
         default: true
       matrix-property:
-          description: "Optional string for matrix strategies (E.g. 'amd64-')"
-          type: string
-          default: ""
+        description: "Optional string for matrix strategies (E.g. 'amd64-')"
+        type: string
+        default: ""
       checkout-submodules:
         description: "Whether to check out submodules or not. Passed on to `submodules` argument of `actions/checkout`"
         type: boolean
         default: false
+    outputs:
+      old-results:
+        description: "Results of the scan before the PR in JSON format (Base64 encoded)"
+        value: ${{ jobs.osv-scan.outputs.old-results }}
+      new-results:
+        description: "Results of the scan after the PR in JSON format (Base64 encoded)"
+        value: ${{ jobs.osv-scan.outputs.new-results }}
 
 jobs:
   osv-scan:
     runs-on: ubuntu-latest
+    outputs:
+      old-results: ${{ steps.export.outputs.old-results }}
+      new-results: ${{ steps.export.outputs.new-results }}
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
@@ -95,6 +105,20 @@ jobs:
             --new=${{ inputs.matrix-property }}new-results.json
             --gh-annotations=true
             --fail-on-vuln=${{ inputs.fail-on-vuln }}
+      - name: "Export results"
+        id: export
+        run: |
+          DELIMITER="EOF_$(tr -dc 'a-zA-Z0-9' < /dev/urandom 2>/dev/null | head -c 16)"
+          if [ -f ${{ inputs.matrix-property }}old-results.json ]; then
+            echo "old-results<<${DELIMITER}" >> "${GITHUB_OUTPUT}"
+            cat ${{ inputs.matrix-property }}old-results.json >> "${GITHUB_OUTPUT}"
+            echo "${DELIMITER}" >> "${GITHUB_OUTPUT}"
+          fi
+          if [ -f ${{ inputs.matrix-property }}new-results.json ]; then
+            echo "new-results<<${DELIMITER}" >> "${GITHUB_OUTPUT}"
+            cat ${{ inputs.matrix-property }}new-results.json >> "${GITHUB_OUTPUT}"
+            echo "${DELIMITER}" >> "${GITHUB_OUTPUT}"
+          fi
       # Upload the results as artifacts (optional). Commenting out will disable uploads of run results in SARIF
       # format to the repository Actions tab.
       - name: "Upload artifact"

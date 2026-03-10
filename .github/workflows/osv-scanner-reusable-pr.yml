@@ -71,7 +71,7 @@ jobs:
         with:
           scan-args: |-
             --format=json
-            --output=${{ inputs.matrix-property }}old-results.json
+            --output-file=${{ inputs.matrix-property }}old-results.json
             ${{ inputs.scan-args }}
       - name: "Checkout current branch"
         # Use -f in case any changes were made by osv-scanner (there should be no changes)
@@ -83,14 +83,14 @@ jobs:
         with:
           scan-args: |-
             --format=json
-            --output=${{ inputs.matrix-property }}new-results.json
+            --output-file=${{ inputs.matrix-property }}new-results.json
             ${{ inputs.scan-args }}
         continue-on-error: true
       - name: "Run osv-scanner-reporter"
         uses: google/osv-scanner-action/osv-reporter-action@8018483926dd235b3013d8c88023e644b9f8e09e # v2.3.3
         with:
           scan-args: |-
-            --output=${{ inputs.matrix-property }}${{ inputs.results-file-name }}
+            --output-file=${{ inputs.matrix-property }}${{ inputs.results-file-name }}
             --old=${{ inputs.matrix-property }}old-results.json
             --new=${{ inputs.matrix-property }}new-results.json
             --gh-annotations=true

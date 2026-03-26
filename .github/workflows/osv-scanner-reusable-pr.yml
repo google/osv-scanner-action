@@ -99,21 +99,21 @@ jobs:
       # format to the repository Actions tab.
       - name: "Upload artifact"
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: OSV Scanner SARIF file
           path: ${{ inputs.matrix-property }}${{ inputs.results-file-name }}
           retention-days: 5
       - name: "Upload old scan json results"
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: ${{ inputs.matrix-property }}old-json-results
           path: ${{ inputs.matrix-property }}old-results.json
           retention-days: 5
       - name: "Upload new scan json results"
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: ${{ inputs.matrix-property }}new-json-results
           path: ${{ inputs.matrix-property }}new-results.json

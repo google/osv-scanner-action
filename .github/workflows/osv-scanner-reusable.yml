@@ -71,7 +71,7 @@ jobs:
           submodules: ${{ inputs.checkout-submodules }}
           ref: ${{ inputs.ref }}
       - name: "Download custom artifact if specified"
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         if: "${{ inputs.download-artifact != '' }}"
         with:
           name: "${{ inputs.download-artifact }}"
@@ -97,7 +97,7 @@ jobs:
       - name: "Upload artifact"
         id: "upload_artifact"
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: ${{ inputs.matrix-property }}OSV Scanner SARIF file
           path: ${{ inputs.matrix-property }}${{ inputs.results-file-name }}

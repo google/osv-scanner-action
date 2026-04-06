@@ -53,10 +53,10 @@ on:
         default: false
     outputs:
       old-results:
-        description: "Results of the scan before the PR in JSON format (Base64 encoded)"
+        description: "Results of the scan before the PR in JSON format"
         value: ${{ jobs.osv-scan.outputs.old-results }}
       new-results:
-        description: "Results of the scan after the PR in JSON format (Base64 encoded)"
+        description: "Results of the scan after the PR in JSON format"
         value: ${{ jobs.osv-scan.outputs.new-results }}
 
 jobs:
@@ -105,6 +105,10 @@ jobs:
             --new=${{ inputs.matrix-property }}new-results.json
             --gh-annotations=true
             --fail-on-vuln=${{ inputs.fail-on-vuln }}
+      # Exports the old and new results as JSON strings in environment
+      # variables. Uses heredocs with random 16-character delimiters
+      # to avoid interference between the JSON contents and the
+      # environment variables.
       - name: "Export results"
         id: export
         run: |

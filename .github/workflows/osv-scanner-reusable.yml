@@ -62,7 +62,7 @@ on:
         default: ""
     outputs:
       results:
-        description: "Results of the scan in JSON format (Base64 encoded)"
+        description: "Results of the scan in JSON format"
         value: ${{ jobs.osv-scan.outputs.results }}
 
 jobs:
@@ -98,6 +98,10 @@ jobs:
             --new=${{ inputs.matrix-property }}results.json
             --gh-annotations=false
             --fail-on-vuln=${{ inputs.fail-on-vuln }}
+      # Exports the results as a JSON string in an environment
+      # variable. Uses a heredoc with a random 16-character delimiter
+      # to avoid interference between the JSON content and the
+      # environment variable.
       - name: "Export results"
         id: export
         run: |

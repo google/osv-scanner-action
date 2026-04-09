@@ -25,7 +25,7 @@ on:
   workflow_call:
     inputs:
       scan-args:
-        description: "Custom osv-scanner arguments (See https://google.github.io/osv-scanner/usage/ for options, you cannot set --format or --output)"
+        description: "Custom osv-scanner arguments (See https://google.github.io/osv-scanner/usage/ for options, you cannot set --format or --output-file)"
         type: string
         default: |-
           -r
@@ -81,7 +81,7 @@ jobs:
         with:
           scan-args: |-
             --format=json
-            --output=${{ inputs.matrix-property }}old-results.json
+            --output-file=${{ inputs.matrix-property }}old-results.json
             ${{ inputs.scan-args }}
       - name: "Checkout current branch"
         # Use -f in case any changes were made by osv-scanner (there should be no changes)
@@ -93,14 +93,14 @@ jobs:
         with:
           scan-args: |-
             --format=json
-            --output=${{ inputs.matrix-property }}new-results.json
+            --output-file=${{ inputs.matrix-property }}new-results.json
             ${{ inputs.scan-args }}
         continue-on-error: true
       - name: "Run osv-scanner-reporter"
         uses: google/osv-scanner-action/osv-reporter-action@7222d1c7ee4f96d71d883e0d3c603f1e1705eca9 # v2.3.5
         with:
           scan-args: |-
-            --output=${{ inputs.matrix-property }}${{ inputs.results-file-name }}
+            --output-file=${{ inputs.matrix-property }}${{ inputs.results-file-name }}
             --old=${{ inputs.matrix-property }}old-results.json
             --new=${{ inputs.matrix-property }}new-results.json
             --gh-annotations=true

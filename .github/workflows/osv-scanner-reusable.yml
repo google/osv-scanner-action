@@ -60,6 +60,10 @@ on:
         description: "Whether to checkout a custom branch/tag/commit for scanning other than the default branch"
         type: string
         default: ""
+      export-results:
+        description: "Whether to export the scan results as job outputs (can fail for large repositories due to size limits)"
+        type: boolean
+        default: false
     outputs:
       results:
         description: "Results of the scan in JSON format"
@@ -104,6 +108,7 @@ jobs:
       # environment variable.
       - name: "Export results"
         id: export
+        if: ${{ inputs.export-results }}
         run: |
           if [ -f ${{ inputs.matrix-property }}osv-results.json ]; then
             DELIMITER="EOF_$(tr -dc 'a-zA-Z0-9' < /dev/urandom 2>/dev/null | head -c 16)"

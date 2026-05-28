@@ -55,6 +55,10 @@ on:
         description: "Whether to export the scan results as job outputs (can fail for large repositories due to size limits)"
         type: boolean
         default: false
+      runs-on:
+        description: "The runner to use for the scan job (E.g. 'ubuntu-latest', 'ubuntu-24.04', or a self-hosted runner label)"
+        type: string
+        default: "ubuntu-latest"
     outputs:
       old-results:
         description: "Results of the scan before the PR in JSON format"
@@ -65,7 +69,7 @@ on:
 
 jobs:
   osv-scan:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runs-on }}
     outputs:
       old-results: ${{ steps.export.outputs.old-results }}
       new-results: ${{ steps.export.outputs.new-results }}

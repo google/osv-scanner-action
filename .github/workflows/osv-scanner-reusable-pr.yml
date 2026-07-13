@@ -121,16 +121,18 @@ jobs:
       - name: "Export results"
         id: export
         if: ${{ inputs.export-results }}
+        env:
+          MATRIX_PROPERTY: ${{ inputs.matrix-property }}
         run: |
           DELIMITER="EOF_$(tr -dc 'a-zA-Z0-9' < /dev/urandom 2>/dev/null | head -c 16)"
-          if [ -f ${{ inputs.matrix-property }}old-results.json ]; then
+          if [ -f "${MATRIX_PROPERTY}old-results.json" ]; then
             echo "old-results<<${DELIMITER}" >> "${GITHUB_OUTPUT}"
-            cat ${{ inputs.matrix-property }}old-results.json >> "${GITHUB_OUTPUT}"
+            cat "${MATRIX_PROPERTY}old-results.json" >> "${GITHUB_OUTPUT}"
             echo "${DELIMITER}" >> "${GITHUB_OUTPUT}"
           fi
-          if [ -f ${{ inputs.matrix-property }}new-results.json ]; then
+          if [ -f "${MATRIX_PROPERTY}new-results.json" ]; then
             echo "new-results<<${DELIMITER}" >> "${GITHUB_OUTPUT}"
-            cat ${{ inputs.matrix-property }}new-results.json >> "${GITHUB_OUTPUT}"
+            cat "${MATRIX_PROPERTY}new-results.json" >> "${GITHUB_OUTPUT}"
             echo "${DELIMITER}" >> "${GITHUB_OUTPUT}"
           fi
       # Upload the results as artifacts (optional). Commenting out will disable uploads of run results in SARIF

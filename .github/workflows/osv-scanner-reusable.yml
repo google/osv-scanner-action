@@ -15,11 +15,7 @@
 # Performs a vulnerability scan with OSV-Scanner and reports the result.
 name: OSV-Scanner single vulnerability scan
 
-permissions:
-  # Required to upload SARIF file to CodeQL. See: https://github.com/github/codeql-action/issues/2117
-  actions: read
-  contents: read
-  security-events: write
+
 
 on:
   workflow_call:
@@ -76,6 +72,11 @@ on:
 jobs:
   osv-scan:
     runs-on: ${{ inputs.runs-on }}
+    permissions:
+      # Required to upload SARIF file to CodeQL. See: https://github.com/github/codeql-action/issues/2117
+      actions: read
+      contents: read
+      security-events: write
     outputs:
       results: ${{ steps.export.outputs.results }}
     steps:
@@ -113,11 +114,13 @@ jobs:
       - name: "Export results"
         id: export
         if: ${{ inputs.export-results }}
+        env:
+          MATRIX_PROPERTY: ${{ inputs.matrix-property }}
         run: |
-          if [ -f ${{ inputs.matrix-property }}osv-results.json ]; then
+          if [ -f "${MATRIX_PROPERTY}osv-results.json" ]; then
             DELIMITER="EOF_$(tr -dc 'a-zA-Z0-9' < /dev/urandom 2>/dev/null | head -c 16)"
             echo "results<<${DELIMITER}" >> "${GITHUB_OUTPUT}"
-            cat ${{ inputs.matrix-property }}osv-results.json >> "${GITHUB_OUTPUT}"
+            cat "${MATRIX_PROPERTY}osv-results.json" >> "${GITHUB_OUTPUT}"
             echo "${DELIMITER}" >> "${GITHUB_OUTPUT}"
           fi
       # Upload the results as artifacts (optional). Commenting out will disable uploads of run results in SARIF

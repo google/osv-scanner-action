@@ -15,11 +15,7 @@
 # Performs a vulnerability scan with OSV-Scanner and reports the result.
 name: OSV-Scanner single vulnerability scan
 
-permissions:
-  # Required to upload SARIF file to CodeQL. See: https://github.com/github/codeql-action/issues/2117
-  actions: read
-  contents: read
-  security-events: write
+
 
 on:
   workflow_call:
@@ -76,6 +72,11 @@ on:
 jobs:
   osv-scan:
     runs-on: ${{ inputs.runs-on }}
+    permissions:
+      # Required to upload SARIF file to CodeQL. See: https://github.com/github/codeql-action/issues/2117
+      actions: read
+      contents: read
+      security-events: write
     outputs:
       results: ${{ steps.export.outputs.results }}
     steps:

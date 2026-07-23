@@ -25,5 +25,7 @@ inputs:
 runs:
   using: "docker"
   image: "docker://ghcr.io/google/osv-scanner-action:v2.3.8"
+  env:
+    GOTOOLCHAIN: auto
   args:
     - ${{ inputs.scan-args }}

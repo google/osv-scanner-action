@@ -86,6 +86,8 @@ jobs:
           git submodule update --recursive
       - name: "Run scanner on existing code"
         uses: google/osv-scanner-action/osv-scanner-action@8dc09193bb540e09b23da07ad7e30bd33bf87018 # v2.3.8
+        env:
+          GOTOOLCHAIN: auto
         continue-on-error: true
         with:
           scan-args: |-
@@ -99,6 +101,8 @@ jobs:
           git submodule update --recursive
       - name: "Run scanner on new code"
         uses: google/osv-scanner-action/osv-scanner-action@8dc09193bb540e09b23da07ad7e30bd33bf87018 # v2.3.8
+        env:
+          GOTOOLCHAIN: auto
         with:
           scan-args: |-
             --format=json

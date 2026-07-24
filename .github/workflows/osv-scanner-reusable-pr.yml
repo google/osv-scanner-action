@@ -99,6 +99,24 @@ jobs:
         run: |
           git checkout -f $GITHUB_SHA
           git submodule update --recursive
+      - name: "Guard against symlinked scan result paths"
+        # The checkout above materializes untrusted PR content, which can
+        # include a symlink at one of the fixed result paths used below.
+        # The scanner and reporter write and read these paths with calls
+        # that follow symlinks, so a PR-controlled symlink here (for
+        # example new-results.json -> old-results.json) can clobber the
+        # base scan results and suppress newly introduced findings. Refuse
+        # to continue if any of these paths is a symlink.
+        env:
+          MATRIX_PROPERTY: ${{ inputs.matrix-property }}
+          RESULTS_FILE_NAME: ${{ inputs.results-file-name }}
+        run: |
+          for path in "${MATRIX_PROPERTY}old-results.json" "${MATRIX_PROPERTY}new-results.json" "${MATRIX_PROPERTY}${RESULTS_FILE_NAME}"; do
+            if [ -L "$path" ]; then
+              echo "::error::Refusing to scan through a symlinked result path introduced by the pull request: $path"
+              exit 1
+            fi
+          done
       - name: "Run scanner on new code"
         uses: google/osv-scanner-action/osv-scanner-action@8dc09193bb540e09b23da07ad7e30bd33bf87018 # v2.3.8
         env:

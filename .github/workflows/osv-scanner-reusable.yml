@@ -92,6 +92,7 @@ jobs:
           name: "${{ inputs.download-artifact }}"
           path: "./"
       - name: "Run scanner"
+        id: "scan"
         uses: google/osv-scanner-action/osv-scanner-action@06b2ab4348248b456ee06c9e953637f55e03504f # v2.5.0
         env:
           GOTOOLCHAIN: auto
@@ -101,6 +102,21 @@ jobs:
             --format=json
             ${{ inputs.scan-args }}
         continue-on-error: true
+      # osv-scanner exits non-zero both when it finds vulnerabilities, which the
+      # reporter step below is responsible for acting on, and when the scan itself
+      # fails, so the continue-on-error above cannot tell the two apart. A scan that
+      # fails writes no results file, and the reporter treats a missing --new file as
+      # "no vulnerabilities found" and exits 0, which would turn a failed scan into a
+      # passing check. Report only on a scan that produced results.
+      - name: "Check that the scan completed"
+        if: ${{ steps.scan.outcome == 'failure' }}
+        env:
+          RESULTS: ${{ inputs.matrix-property }}results.json
+        run: |
+          if [ ! -f "${RESULTS}" ]; then
+            echo "::error::OSV-Scanner failed without writing ${RESULTS}, so there are no results to report on. Failing the job rather than reporting no vulnerabilities found. See the \"Run scanner\" step for the cause."
+            exit 1
+          fi
       - name: "Run osv-scanner-reporter"
         uses: google/osv-scanner-action/osv-reporter-action@06b2ab4348248b456ee06c9e953637f55e03504f # v2.5.0
         with:

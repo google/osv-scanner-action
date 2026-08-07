@@ -130,7 +130,7 @@ jobs:
       - name: "Upload artifact"
         id: "upload_artifact"
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ${{ inputs.matrix-property }}OSV Scanner SARIF file
           path: ${{ inputs.matrix-property }}${{ inputs.results-file-name }}
@@ -138,7 +138,7 @@ jobs:
       # Upload the results to GitHub's code scanning dashboard.
       - name: "Upload to code-scanning"
         if: "${{ !cancelled() && inputs.upload-sarif == true }}"
-        uses: github/codeql-action/upload-sarif@cdefb33c0f6224e58673d9004f47f7cb3e328b89 # v4.31.10
+        uses: github/codeql-action/upload-sarif@5595ccaf912efad79be6eef63a5619ff05969be3 # v4.37.6
         with:
           sarif_file: ${{ inputs.matrix-property }}${{ inputs.results-file-name }}
       - name: "Print Code Scanning URL"

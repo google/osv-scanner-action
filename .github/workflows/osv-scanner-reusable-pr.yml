@@ -127,11 +127,11 @@ jobs:
           NEW_RESULTS: ${{ inputs.matrix-property }}new-results.json
         run: |
           status=0
-          if [ "${OLD_OUTCOME}" = "failure" ] && [ ! -f "${OLD_RESULTS}" ]; then
+          if [ "${OLD_OUTCOME}" = "failure" ] && [ ! -s "${OLD_RESULTS}" ]; then
             echo "::error::OSV-Scanner failed on the target branch without writing ${OLD_RESULTS}. See the \"Run scanner on existing code\" step for the cause."
             status=1
           fi
-          if [ "${NEW_OUTCOME}" = "failure" ] && [ ! -f "${NEW_RESULTS}" ]; then
+          if [ "${NEW_OUTCOME}" = "failure" ] && [ ! -s "${NEW_RESULTS}" ]; then
             echo "::error::OSV-Scanner failed on this branch without writing ${NEW_RESULTS}. See the \"Run scanner on new code\" step for the cause."
             status=1
           fi

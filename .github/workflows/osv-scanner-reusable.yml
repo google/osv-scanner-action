@@ -113,7 +113,7 @@ jobs:
         env:
           RESULTS: ${{ inputs.matrix-property }}results.json
         run: |
-          if [ ! -f "${RESULTS}" ]; then
+          if [ ! -s "${RESULTS}" ]; then
             echo "::error::OSV-Scanner failed without writing ${RESULTS}, so there are no results to report on. Failing the job rather than reporting no vulnerabilities found. See the \"Run scanner\" step for the cause."
             exit 1
           fi

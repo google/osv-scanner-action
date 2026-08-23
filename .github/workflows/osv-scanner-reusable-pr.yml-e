@@ -1,0 +1,164 @@
+# Copyright 2023 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# OSV-Scanner PR scanning reusable workflow, can be used as a PR action to detect new vulnerabilities being introduced.
+name: "OSV-Scanner PR Scanning"
+
+permissions:
+  # Required to upload SARIF file to CodeQL. See: https://github.com/github/codeql-action/issues/2117
+  actions: read
+  contents: read
+  security-events: write
+
+on:
+  workflow_call:
+    inputs:
+      scan-args:
+        description: "Custom osv-scanner arguments (See https://google.github.io/osv-scanner/usage/ for options, you cannot set --format or --output)"
+        type: string
+        default: |-
+          -r
+          ./
+      results-file-name:
+        description: "File name of the result SARIF file"
+        type: string
+        default: results.sarif
+      upload-sarif:
+        description: "Whether to upload to Security > Code Scanning"
+        type: boolean
+        required: false
+        default: true
+      fail-on-vuln:
+        description: "Whether to fail the action on vulnerability found"
+        type: boolean
+        default: true
+      matrix-property:
+        description: "Optional string for matrix strategies (E.g. 'amd64-')"
+        type: string
+        default: ""
+      checkout-submodules:
+        description: "Whether to check out submodules or not. Passed on to `submodules` argument of `actions/checkout`"
+        type: boolean
+        default: false
+    outputs:
+      old-results:
+        description: "Results of the scan before the PR in JSON format"
+        value: ${{ jobs.osv-scan.outputs.old-results }}
+      new-results:
+        description: "Results of the scan after the PR in JSON format"
+        value: ${{ jobs.osv-scan.outputs.new-results }}
+
+jobs:
+  osv-scan:
+    runs-on: ubuntu-latest
+    outputs:
+      old-results: ${{ steps.export.outputs.old-results }}
+      new-results: ${{ steps.export.outputs.new-results }}
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          fetch-depth: 0
+          submodules: ${{ inputs.checkout-submodules }}
+          # Do persist credentials, as we need it for the git checkout later
+      - name: "Checkout target branch"
+        run: |
+          git checkout $GITHUB_BASE_REF
+          git submodule update --recursive
+      - name: "Run scanner on existing code"
+        uses: google/osv-scanner-action/osv-scanner-action@8dc09193bb540e09b23da07ad7e30bd33bf87018 # v2.3.8
+        continue-on-error: true
+        with:
+          scan-args: |-
+            --format=json
+            --output=${{ inputs.matrix-property }}old-results.json
+            ${{ inputs.scan-args }}
+      - name: "Checkout current branch"
+        # Use -f in case any changes were made by osv-scanner (there should be no changes)
+        run: |
+          git checkout -f $GITHUB_SHA
+          git submodule update --recursive
+      - name: "Run scanner on new code"
+        uses: google/osv-scanner-action/osv-scanner-action@8dc09193bb540e09b23da07ad7e30bd33bf87018 # v2.3.8
+        with:
+          scan-args: |-
+            --format=json
+            --output=${{ inputs.matrix-property }}new-results.json
+            ${{ inputs.scan-args }}
+        continue-on-error: true
+      - name: "Run osv-scanner-reporter"
+        uses: google/osv-scanner-action/osv-reporter-action@8dc09193bb540e09b23da07ad7e30bd33bf87018 # v2.3.8
+        with:
+          scan-args: |-
+            --output=${{ inputs.matrix-property }}${{ inputs.results-file-name }}
+            --old=${{ inputs.matrix-property }}old-results.json
+            --new=${{ inputs.matrix-property }}new-results.json
+            --gh-annotations=true
+            --fail-on-vuln=${{ inputs.fail-on-vuln }}
+      # Exports the old and new results as JSON strings in environment
+      # variables. Uses heredocs with random 16-character delimiters
+      # to avoid interference between the JSON contents and the
+      # environment variables.
+      - name: "Export results"
+        id: export
+        run: |
+          DELIMITER="EOF_$(tr -dc 'a-zA-Z0-9' < /dev/urandom 2>/dev/null | head -c 16)"
+          if [ -f ${{ inputs.matrix-property }}old-results.json ]; then
+            echo "old-results<<${DELIMITER}" >> "${GITHUB_OUTPUT}"
+            cat ${{ inputs.matrix-property }}old-results.json >> "${GITHUB_OUTPUT}"
+            echo "${DELIMITER}" >> "${GITHUB_OUTPUT}"
+          fi
+          if [ -f ${{ inputs.matrix-property }}new-results.json ]; then
+            echo "new-results<<${DELIMITER}" >> "${GITHUB_OUTPUT}"
+            cat ${{ inputs.matrix-property }}new-results.json >> "${GITHUB_OUTPUT}"
+            echo "${DELIMITER}" >> "${GITHUB_OUTPUT}"
+          fi
+      # Upload the results as artifacts (optional). Commenting out will disable uploads of run results in SARIF
+      # format to the repository Actions tab.
+      - name: "Upload artifact"
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: OSV Scanner SARIF file
+          path: ${{ inputs.matrix-property }}${{ inputs.results-file-name }}
+          retention-days: 5
+      - name: "Upload old scan json results"
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: ${{ inputs.matrix-property }}old-json-results
+          path: ${{ inputs.matrix-property }}old-results.json
+          retention-days: 5
+      - name: "Upload new scan json results"
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: ${{ inputs.matrix-property }}new-json-results
+          path: ${{ inputs.matrix-property }}new-results.json
+          retention-days: 5
+      # Upload the results to GitHub's code scanning dashboard.
+      - name: "Upload to code-scanning"
+        id: "upload_artifact"
+        if: ${{ !cancelled() && inputs.upload-sarif == true }}
+        uses: github/codeql-action/upload-sarif@cdefb33c0f6224e58673d9004f47f7cb3e328b89 # v4.31.10
+        with:
+          sarif_file: ${{ inputs.matrix-property }}${{ inputs.results-file-name }}
+      - name: "Print Code Scanning PR URL"
+        if: "${{ !cancelled() && inputs.upload-sarif == true }}"
+        run: |
+          echo "View the OSV-Scanner results for this PR in the 'Security' tab, using the following link:"
+          echo "${{ github.server_url }}/${{ github.repository }}/security/code-scanning?query=pr%3A${{ github.event.pull_request.number }}"
+      - name: "Error troubleshooter"
+        if: ${{ always() && steps.upload_artifact.outcome == 'failure' }}
+        run: |
+          echo "::error::Artifact upload failed. This is most likely caused by a error during scanning earlier in the workflow."

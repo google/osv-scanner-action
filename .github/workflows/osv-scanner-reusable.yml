@@ -93,7 +93,7 @@ jobs:
           path: "./"
       - name: "Run scanner"
         id: "scan"
-        uses: google/osv-scanner-action/osv-scanner-action@06b2ab4348248b456ee06c9e953637f55e03504f # v2.5.0
+        uses: google/osv-scanner-action/osv-scanner-action@baa4139e56d6312335d899e6ba045fa16d1d3d0b # v2.5.1
         env:
           GOTOOLCHAIN: auto
         with:
@@ -118,7 +118,7 @@ jobs:
             exit 1
           fi
       - name: "Run osv-scanner-reporter"
-        uses: google/osv-scanner-action/osv-reporter-action@06b2ab4348248b456ee06c9e953637f55e03504f # v2.5.0
+        uses: google/osv-scanner-action/osv-reporter-action@baa4139e56d6312335d899e6ba045fa16d1d3d0b # v2.5.1
         with:
           scan-args: |-
             --output=${{ inputs.matrix-property }}${{ inputs.results-file-name }}
@@ -135,10 +135,10 @@ jobs:
         env:
           MATRIX_PROPERTY: ${{ inputs.matrix-property }}
         run: |
-          if [ -f "${MATRIX_PROPERTY}osv-results.json" ]; then
+          if [ -f "${MATRIX_PROPERTY}results.json" ]; then
             DELIMITER="EOF_$(tr -dc 'a-zA-Z0-9' < /dev/urandom 2>/dev/null | head -c 16)"
             echo "results<<${DELIMITER}" >> "${GITHUB_OUTPUT}"
-            cat "${MATRIX_PROPERTY}osv-results.json" >> "${GITHUB_OUTPUT}"
+            cat "${MATRIX_PROPERTY}results.json" >> "${GITHUB_OUTPUT}"
             echo "${DELIMITER}" >> "${GITHUB_OUTPUT}"
           fi
       # Upload the results as artifacts (optional). Commenting out will disable uploads of run results in SARIF

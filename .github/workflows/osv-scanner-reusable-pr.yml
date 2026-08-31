@@ -85,6 +85,7 @@ jobs:
           git checkout $GITHUB_BASE_REF
           git submodule update --recursive
       - name: "Run scanner on existing code"
+        id: "scan-old"
         uses: google/osv-scanner-action/osv-scanner-action@baa4139e56d6312335d899e6ba045fa16d1d3d0b # v2.5.1
         env:
           GOTOOLCHAIN: auto
@@ -100,6 +101,7 @@ jobs:
           git checkout -f $GITHUB_SHA
           git submodule update --recursive
       - name: "Run scanner on new code"
+        id: "scan-new"
         uses: google/osv-scanner-action/osv-scanner-action@baa4139e56d6312335d899e6ba045fa16d1d3d0b # v2.5.1
         env:
           GOTOOLCHAIN: auto
@@ -109,6 +111,34 @@ jobs:
             --output=${{ inputs.matrix-property }}new-results.json
             ${{ inputs.scan-args }}
         continue-on-error: true
+      # osv-scanner exits non-zero both when it finds vulnerabilities, which the
+      # reporter step below is responsible for acting on, and when the scan itself
+      # fails, so the continue-on-error above cannot tell the two apart. A scan that
+      # fails writes no results file, and the reporter treats a missing --new file as
+      # "no new vulnerabilities" and exits 0. Since the new-code scan runs against the
+      # contents of the pull request, that would let a change which stops the scanner
+      # from completing pass as a clean diff. Compare only scans that produced results.
+      - name: "Check that both scans completed"
+        if: ${{ steps.scan-old.outcome == 'failure' || steps.scan-new.outcome == 'failure' }}
+        env:
+          OLD_OUTCOME: ${{ steps.scan-old.outcome }}
+          NEW_OUTCOME: ${{ steps.scan-new.outcome }}
+          OLD_RESULTS: ${{ inputs.matrix-property }}old-results.json
+          NEW_RESULTS: ${{ inputs.matrix-property }}new-results.json
+        run: |
+          status=0
+          if [ "${OLD_OUTCOME}" = "failure" ] && [ ! -s "${OLD_RESULTS}" ]; then
+            echo "::error::OSV-Scanner failed on the target branch without writing ${OLD_RESULTS}. See the \"Run scanner on existing code\" step for the cause."
+            status=1
+          fi
+          if [ "${NEW_OUTCOME}" = "failure" ] && [ ! -s "${NEW_RESULTS}" ]; then
+            echo "::error::OSV-Scanner failed on this branch without writing ${NEW_RESULTS}. See the \"Run scanner on new code\" step for the cause."
+            status=1
+          fi
+          if [ "${status}" -ne 0 ]; then
+            echo "::error::A scan did not complete, so the two sets of results cannot be compared. Failing the job rather than reporting no new vulnerabilities found."
+          fi
+          exit "${status}"
       - name: "Run osv-scanner-reporter"
         uses: google/osv-scanner-action/osv-reporter-action@baa4139e56d6312335d899e6ba045fa16d1d3d0b # v2.5.1
         with:

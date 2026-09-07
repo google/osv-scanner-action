@@ -15,11 +15,7 @@
 # OSV-Scanner PR scanning reusable workflow, can be used as a PR action to detect new vulnerabilities being introduced.
 name: "OSV-Scanner PR Scanning"
 
-permissions:
-  # Required to upload SARIF file to CodeQL. See: https://github.com/github/codeql-action/issues/2117
-  actions: read
-  contents: read
-  security-events: write
+
 
 on:
   workflow_call:
@@ -44,19 +40,42 @@ on:
         type: boolean
         default: true
       matrix-property:
-          description: "Optional string for matrix strategies (E.g. 'amd64-')"
-          type: string
-          default: ""
+        description: "Optional string for matrix strategies (E.g. 'amd64-')"
+        type: string
+        default: ""
       checkout-submodules:
         description: "Whether to check out submodules or not. Passed on to `submodules` argument of `actions/checkout`"
         type: boolean
         default: false
+      export-results:
+        description: "Whether to export the scan results as job outputs (can fail for large repositories due to size limits)"
+        type: boolean
+        default: false
+      runs-on:
+        description: "The runner to use for the scan job (E.g. 'ubuntu-latest', 'ubuntu-24.04', or a self-hosted runner label)"
+        type: string
+        default: "ubuntu-latest"
+    outputs:
+      old-results:
+        description: "Results of the scan before the PR in JSON format"
+        value: ${{ jobs.osv-scan.outputs.old-results }}
+      new-results:
+        description: "Results of the scan after the PR in JSON format"
+        value: ${{ jobs.osv-scan.outputs.new-results }}
 
 jobs:
   osv-scan:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runs-on }}
+    permissions:
+      # Required to upload SARIF file to CodeQL. See: https://github.com/github/codeql-action/issues/2117
+      actions: read
+      contents: read
+      security-events: write
+    outputs:
+      old-results: ${{ steps.export.outputs.old-results }}
+      new-results: ${{ steps.export.outputs.new-results }}
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           submodules: ${{ inputs.checkout-submodules }}
@@ -66,7 +85,10 @@ jobs:
           git checkout $GITHUB_BASE_REF
           git submodule update --recursive
       - name: "Run scanner on existing code"
-        uses: google/osv-scanner-action/osv-scanner-action@nightly # v2.0.3
+        id: "scan-old"
+        uses: google/osv-scanner-action/osv-scanner-action@nightly
+        env:
+          GOTOOLCHAIN: auto
         continue-on-error: true
         with:
           scan-args: |-
@@ -79,15 +101,46 @@ jobs:
           git checkout -f $GITHUB_SHA
           git submodule update --recursive
       - name: "Run scanner on new code"
-        uses: google/osv-scanner-action/osv-scanner-action@nightly # v2.0.3
+        id: "scan-new"
+        uses: google/osv-scanner-action/osv-scanner-action@nightly
+        env:
+          GOTOOLCHAIN: auto
         with:
           scan-args: |-
             --format=json
             --output=${{ inputs.matrix-property }}new-results.json
             ${{ inputs.scan-args }}
         continue-on-error: true
+      # osv-scanner exits non-zero both when it finds vulnerabilities, which the
+      # reporter step below is responsible for acting on, and when the scan itself
+      # fails, so the continue-on-error above cannot tell the two apart. A scan that
+      # fails writes no results file, and the reporter treats a missing --new file as
+      # "no new vulnerabilities" and exits 0. Since the new-code scan runs against the
+      # contents of the pull request, that would let a change which stops the scanner
+      # from completing pass as a clean diff. Compare only scans that produced results.
+      - name: "Check that both scans completed"
+        if: ${{ steps.scan-old.outcome == 'failure' || steps.scan-new.outcome == 'failure' }}
+        env:
+          OLD_OUTCOME: ${{ steps.scan-old.outcome }}
+          NEW_OUTCOME: ${{ steps.scan-new.outcome }}
+          OLD_RESULTS: ${{ inputs.matrix-property }}old-results.json
+          NEW_RESULTS: ${{ inputs.matrix-property }}new-results.json
+        run: |
+          status=0
+          if [ "${OLD_OUTCOME}" = "failure" ] && [ ! -s "${OLD_RESULTS}" ]; then
+            echo "::error::OSV-Scanner failed on the target branch without writing ${OLD_RESULTS}. See the \"Run scanner on existing code\" step for the cause."
+            status=1
+          fi
+          if [ "${NEW_OUTCOME}" = "failure" ] && [ ! -s "${NEW_RESULTS}" ]; then
+            echo "::error::OSV-Scanner failed on this branch without writing ${NEW_RESULTS}. See the \"Run scanner on new code\" step for the cause."
+            status=1
+          fi
+          if [ "${status}" -ne 0 ]; then
+            echo "::error::A scan did not complete, so the two sets of results cannot be compared. Failing the job rather than reporting no new vulnerabilities found."
+          fi
+          exit "${status}"
       - name: "Run osv-scanner-reporter"
-        uses: google/osv-scanner-action/osv-reporter-action@nightly # v2.0.3
+        uses: google/osv-scanner-action/osv-reporter-action@nightly
         with:
           scan-args: |-
             --output=${{ inputs.matrix-property }}${{ inputs.results-file-name }}
@@ -95,25 +148,46 @@ jobs:
             --new=${{ inputs.matrix-property }}new-results.json
             --gh-annotations=true
             --fail-on-vuln=${{ inputs.fail-on-vuln }}
+      # Exports the old and new results as JSON strings in environment
+      # variables. Uses heredocs with random 16-character delimiters
+      # to avoid interference between the JSON contents and the
+      # environment variables.
+      - name: "Export results"
+        id: export
+        if: ${{ inputs.export-results }}
+        env:
+          MATRIX_PROPERTY: ${{ inputs.matrix-property }}
+        run: |
+          DELIMITER="EOF_$(tr -dc 'a-zA-Z0-9' < /dev/urandom 2>/dev/null | head -c 16)"
+          if [ -f "${MATRIX_PROPERTY}old-results.json" ]; then
+            echo "old-results<<${DELIMITER}" >> "${GITHUB_OUTPUT}"
+            cat "${MATRIX_PROPERTY}old-results.json" >> "${GITHUB_OUTPUT}"
+            echo "${DELIMITER}" >> "${GITHUB_OUTPUT}"
+          fi
+          if [ -f "${MATRIX_PROPERTY}new-results.json" ]; then
+            echo "new-results<<${DELIMITER}" >> "${GITHUB_OUTPUT}"
+            cat "${MATRIX_PROPERTY}new-results.json" >> "${GITHUB_OUTPUT}"
+            echo "${DELIMITER}" >> "${GITHUB_OUTPUT}"
+          fi
       # Upload the results as artifacts (optional). Commenting out will disable uploads of run results in SARIF
       # format to the repository Actions tab.
       - name: "Upload artifact"
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: SARIF file
+          name: OSV Scanner SARIF file
           path: ${{ inputs.matrix-property }}${{ inputs.results-file-name }}
           retention-days: 5
       - name: "Upload old scan json results"
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ${{ inputs.matrix-property }}old-json-results
           path: ${{ inputs.matrix-property }}old-results.json
           retention-days: 5
       - name: "Upload new scan json results"
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ${{ inputs.matrix-property }}new-json-results
           path: ${{ inputs.matrix-property }}new-results.json
@@ -122,7 +196,7 @@ jobs:
       - name: "Upload to code-scanning"
         id: "upload_artifact"
         if: ${{ !cancelled() && inputs.upload-sarif == true }}
-        uses: github/codeql-action/upload-sarif@fca7ace96b7d713c7035871441bd52efbe39e27e # v3.28.19
+        uses: github/codeql-action/upload-sarif@5595ccaf912efad79be6eef63a5619ff05969be3 # v4.37.6
         with:
           sarif_file: ${{ inputs.matrix-property }}${{ inputs.results-file-name }}
       - name: "Print Code Scanning PR URL"

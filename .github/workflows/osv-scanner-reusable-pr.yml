@@ -86,7 +86,7 @@ jobs:
           git submodule update --recursive
       - name: "Run scanner on existing code"
         id: "scan-old"
-        uses: google/osv-scanner-action/osv-scanner-action@7f58dd6750d78fc29a900ba64b1a0f946f62fba4 # v2.6.0
+        uses: google/osv-scanner-action/osv-scanner-action@0a65f82af05cd58cf587827b0bb0489548c18346 # v2.7.0
         env:
           GOTOOLCHAIN: auto
         continue-on-error: true
@@ -102,7 +102,7 @@ jobs:
           git submodule update --recursive
       - name: "Run scanner on new code"
         id: "scan-new"
-        uses: google/osv-scanner-action/osv-scanner-action@7f58dd6750d78fc29a900ba64b1a0f946f62fba4 # v2.6.0
+        uses: google/osv-scanner-action/osv-scanner-action@0a65f82af05cd58cf587827b0bb0489548c18346 # v2.7.0
         env:
           GOTOOLCHAIN: auto
         with:
@@ -140,7 +140,7 @@ jobs:
           fi
           exit "${status}"
       - name: "Run osv-scanner-reporter"
-        uses: google/osv-scanner-action/osv-reporter-action@7f58dd6750d78fc29a900ba64b1a0f946f62fba4 # v2.6.0
+        uses: google/osv-scanner-action/osv-reporter-action@0a65f82af05cd58cf587827b0bb0489548c18346 # v2.7.0
         with:
           scan-args: |-
             --output=${{ inputs.matrix-property }}${{ inputs.results-file-name }}

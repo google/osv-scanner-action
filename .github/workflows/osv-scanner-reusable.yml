@@ -93,7 +93,7 @@ jobs:
           path: "./"
       - name: "Run scanner"
         id: "scan"
-        uses: google/osv-scanner-action/osv-scanner-action@0a65f82af05cd58cf587827b0bb0489548c18346 # v2.7.0
+        uses: google/osv-scanner-action/osv-scanner-action@0e457b42d0120153c352875e9b758b1e5c58c7e5 # v2.7.1
         env:
           GOTOOLCHAIN: auto
         with:
@@ -118,7 +118,7 @@ jobs:
             exit 1
           fi
       - name: "Run osv-scanner-reporter"
-        uses: google/osv-scanner-action/osv-reporter-action@0a65f82af05cd58cf587827b0bb0489548c18346 # v2.7.0
+        uses: google/osv-scanner-action/osv-reporter-action@0e457b42d0120153c352875e9b758b1e5c58c7e5 # v2.7.1
         with:
           scan-args: |-
             --output=${{ inputs.matrix-property }}${{ inputs.results-file-name }}

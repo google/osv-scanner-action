@@ -35,7 +35,7 @@ jobs:
       security-events: write
       # Read commit contents
       contents: read
-    uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@ef6dfdf01765802d5a8dbc3c39852a6128b00af0" # v2.7.0
+    uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@87a33814e525266e92b7ecaa23a9743ee5a702b8" # v2.7.1
     with:
       # Example of specifying custom arguments
       scan-args: |-
@@ -51,7 +51,7 @@ jobs:
       security-events: write
       # Read commit contents
       contents: read
-    uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable-pr.yml@ef6dfdf01765802d5a8dbc3c39852a6128b00af0" # v2.7.0
+    uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable-pr.yml@87a33814e525266e92b7ecaa23a9743ee5a702b8" # v2.7.1
     with:
       # Example of specifying custom arguments
       scan-args: |-
